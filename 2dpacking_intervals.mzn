@@ -10,20 +10,24 @@ array [1..n,1..2] of var 1..k: positions;
 array [1..n,1..2] of var {x,y}: sizes; 
 var 0..n: boxes;
 
+% x != y in sizes
 constraint forall(i in 1..n)(
   sizes[i,1] != sizes[i,2]
 );
 
+% the boxes' corner must be inside the pallet
 constraint forall(i in 1..n)(
   positions[i,1] > 0 /\ positions[i,1] <= k /\
   positions[i,2] > 0 /\ positions[i,2] <= k
 );
 
+%the rest of the box must be inside the pallet
 constraint forall(i in 1..n)(
   positions[i,1] + sizes[i,1] <= k /\
   positions[i,2] + sizes[i,2] <= k
 );
 
+%the boxes must not overlap
 constraint diffn_k(positions, sizes);
 
 solve satisfy;
