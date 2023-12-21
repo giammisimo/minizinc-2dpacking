@@ -5,8 +5,9 @@ int: x = 5;
 int: y = x + 5;
 int: n = 4;%(k*k) div (x*y); %upper bound
 
-%array[1..k,1..k] of var 0..n: grid;
+% Position of the upper-left corner of every box
 array [1..n,1..2] of var 1..k: positions; 
+% Sizes for every boxe
 array [1..n,1..2] of var {x,y}: sizes; 
 var 0..n: boxes;
 
@@ -35,3 +36,4 @@ solve satisfy;
 % symmetry breaking
 % 1. One box must have a corner at the origin
 % 2. Every box must touch another one
+% 3. Boxes are ordered in position based on index
