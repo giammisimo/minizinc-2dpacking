@@ -21,7 +21,7 @@ constraint forall(i in 1..n)(
   positions[i,2] > 0 /\ positions[i,2] <= k
 );
 
-%the rest of the box must be inside the pallet
+%every box must be inside the pallet
 constraint forall(i in 1..n)(
   positions[i,1] + sizes[i,1] <= k /\
   positions[i,2] + sizes[i,2] <= k
@@ -31,3 +31,7 @@ constraint forall(i in 1..n)(
 constraint diffn_k(positions, sizes);
 
 solve satisfy;
+
+% symmetry breaking
+% 1. One box must have a corner at the origin
+% 2. Every box must touch another one
