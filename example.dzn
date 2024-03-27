@@ -1,0 +1,4 @@
+%This file is used as a known example for testing
+%boxes = 4 , n = 7
+k = 19;
+x = 5;
