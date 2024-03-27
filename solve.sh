@@ -12,5 +12,5 @@ export MZN_STDLIB_DIR=$MZN_IDE_DIR/share/minizinc/
 ## https://www.minizinc.org/doc-2.5.5/en/installation_detailed_linux.html#gecode
 ## The <INSTALLATION_PREFIX> in this case is MZN_IDE_DIR
 
-$MINIZINC --solver gecode.msc ./2dpacking_intervals.mzn | tee sol.txt
+$MINIZINC --solver gecode.msc ./2dpacking_intervals.mzn example.dzn | tee sol.txt
 python3 plot.py

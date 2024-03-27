@@ -1,7 +1,7 @@
 import tkinter as tk
 import sys
 
-solution =  open('sol.txt','r').read()
+solution = open('sol.txt','r').read()
 
 parameters = solution.split('***')[0].split('\n')[:-1]
 x, y, k, n = tuple([int(par.split(' ')[1]) for par in parameters])
@@ -10,17 +10,20 @@ print('y',y)
 print('k',k)
 print('n',n)
 
+boxes = int(solution.split('***')[3].split('-')[0].split(' ')[1])
+print('boxes',boxes)
+
 positions = solution.split('***')[1][len('positions:'):].split('\n')[1:-1]
-positions = [(int(pos.split(',')[0]),int(pos.split(',')[1])) for pos in positions]
+positions = [(int(pos.split(',')[0]),int(pos.split(',')[1])) for pos in positions[:boxes]]
 
 sizes = solution.split('***')[2][len('sizes:'):].split('\n')[1:-1]
-sizes = [(int(size.split(',')[0]),int(size.split(',')[1])) for size in sizes]
+sizes = [(int(size.split(',')[0]),int(size.split(',')[1])) for size in sizes[:boxes]]
 
 print('positions',positions)
 print('sizes',sizes)
 
 '''
-old parsing for the following example (default minzinc formatting)
+old parsing for the default minzinc formatting
 positions = 
 [| 1,  1
  | 1, 11
@@ -97,7 +100,7 @@ class GridGUI:
 gui = GridGUI(k, 30)
 gui.draw_grid()
 
-for i in range(n):
+for i in range(boxes):
     gui.place_box(i+1,sizes[i][1],sizes[i][0],positions[i][0]-1,positions[i][1]-1)
 
 gui.run()
