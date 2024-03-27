@@ -1,7 +1,26 @@
 import tkinter as tk
-import re
+import sys
 
-s = '''
+solution =  open('sol.txt','r').read()
+
+parameters = solution.split('***')[0].split('\n')[:-1]
+x, y, k, n = tuple([int(par.split(' ')[1]) for par in parameters])
+print('x',x)
+print('y',y)
+print('k',k)
+print('n',n)
+
+positions = solution.split('***')[1][len('positions:'):].split('\n')[1:-1]
+positions = [(int(pos.split(',')[0]),int(pos.split(',')[1])) for pos in positions]
+
+sizes = solution.split('***')[2][len('sizes:'):].split('\n')[1:-1]
+sizes = [(int(size.split(',')[0]),int(size.split(',')[1])) for size in sizes]
+
+print('positions',positions)
+print('sizes',sizes)
+
+'''
+old parsing for the following example (default minzinc formatting)
 positions = 
 [| 1,  1
  | 1, 11
@@ -14,18 +33,14 @@ sizes =
  | 10,  5
  | 10,  5
  |];
-'''
 s = re.sub('\n','',s)
 s = re.sub('\[\| ','[[',s)
 s = re.sub(' \|\]',']]',s)
 s = re.sub(' \| ','],[',s)
 s = re.sub('[a-z]+ = ','',s)
 positions, sizes = (*s.split(';')[:-1],)
-
 positions = eval(positions)
-sizes = eval(sizes)
-print('positions',positions)
-print('sizes',sizes)
+sizes = eval(sizes)'''
 
 class GridGUI:
     def __init__(self, grid_size: int, cell_size: int):
@@ -79,10 +94,10 @@ class GridGUI:
         self.root.mainloop()
 
 ## Gridsize(k, cellSize)
-gui = GridGUI(19, 20)
+gui = GridGUI(k, 30)
 gui.draw_grid()
 
-for i in range(len(sizes)):
+for i in range(n):
     gui.place_box(i+1,sizes[i][1],sizes[i][0],positions[i][0]-1,positions[i][1]-1)
 
 gui.run()
