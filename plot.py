@@ -22,28 +22,27 @@ sizes = [(int(size.split(',')[0]),int(size.split(',')[1])) for size in sizes[:bo
 print('positions',positions)
 print('sizes',sizes)
 
-'''
-old parsing for the default minzinc formatting
-positions = 
-[| 1,  1
- | 1, 11
- | 6,  6
- | 6,  1
- |];
-sizes = 
-[|  5, 10
- | 10,  5
- | 10,  5
- | 10,  5
- |];
-s = re.sub('\n','',s)
-s = re.sub('\[\| ','[[',s)
-s = re.sub(' \|\]',']]',s)
-s = re.sub(' \| ','],[',s)
-s = re.sub('[a-z]+ = ','',s)
-positions, sizes = (*s.split(';')[:-1],)
-positions = eval(positions)
-sizes = eval(sizes)'''
+# old parsing for the default minzinc formatting
+# positions = 
+# [| 1,  1
+#  | 1, 11
+#  | 6,  6
+#  | 6,  1
+#  |];
+# sizes = 
+# [|  5, 10
+#  | 10,  5
+#  | 10,  5
+#  | 10,  5
+#  |];
+# s = re.sub('\n','',s)
+# s = re.sub('\[\| ','[[',s)
+# s = re.sub(' \|\]',']]',s)
+# s = re.sub(' \| ','],[',s)
+# s = re.sub('[a-z]+ = ','',s)
+# positions, sizes = (*s.split(';')[:-1],)
+# positions = eval(positions)
+# sizes = eval(sizes)
 
 class GridGUI:
     def __init__(self, grid_size: int, cell_size: int):
