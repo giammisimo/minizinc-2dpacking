@@ -1,7 +1,19 @@
 import os
 import subprocess
+import platform
 
 number_of_benchmarks = 2
+
+# MacOS or Linux
+def check_operating_system():
+    os_name = platform.system()
+    if os_name == 'Darwin':
+        return 'macos'
+    elif os_name == 'Linux':
+        return 'linux'
+    else:
+        return 'unsupported'
+
 
 def can_continue(counter: int) -> bool:
     if counter >= number_of_benchmarks:
@@ -62,7 +74,7 @@ def main():
         # %This file is used as a known example for testing
         # %boxes = 4 , n = 7
         # u = 19;
-        # x = 5; dove x è il primo elemento di box_size
+        # x = 5; 
 
         with open('temp.mzn', 'w') as f:
             f.write(f'%This file is used as a known example for testing\n')
@@ -71,11 +83,21 @@ def main():
             f.write(f'x = {box_size[0]};\n')
         
 
-        # Eseguo il comando bash
-
         file_name_without_extension = file_name.split('.')[0]
-        os.system(f"minizinc --solver Gecode ./2dpacking_intervals.mzn temp.mzn | tee ./benchmarks-results/{file_name_without_extension}.txt")
+        if check_operating_system() == 'macos':
+            os.system(f"minizinc --solver Gecode ./2dpacking_intervals.mzn temp.mzn | tee ./benchmarks-results/{file_name_without_extension}.txt")
+        elif check_operating_system() == 'linux':
+            with open('./ide_path', 'r') as file:
+                MZN_IDE_DIR = file.read().strip()
 
+            MINIZINC = os.path.join(MZN_IDE_DIR, 'bin', 'minizinc')
+            MZN_STDLIB_DIR = os.path.join(MZN_IDE_DIR, 'share', 'minizinc')
+            os.environ['MZN_STDLIB_DIR'] = MZN_STDLIB_DIR
+
+            os.system(f"{MINIZINC} --solver gecode.msc ./2dpacking_intervals.mzn temp.mzn | tee ./benchmarks-results/{file_name_without_extension}.txt")
+        else:
+            print("Sistema operativo non supportato.")
+            return
         
 
 
