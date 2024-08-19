@@ -2,3 +2,5 @@ gecode.msc
 ide_path
 sol.txt
 benchmarks/pallet*
+benchmarks-results/**
+temp.mzn
