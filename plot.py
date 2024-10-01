@@ -1,7 +1,7 @@
 import tkinter as tk
 import sys
 
-solution = open('sol.txt','r').read()
+solution = open(sys.argv[1],'r').read()
 
 parameters = solution.split('***')[0].split('\n')[:-1]
 x, y, k, n = tuple([int(par.split(' ')[1]) for par in parameters])
@@ -10,7 +10,7 @@ print('y',y)
 print('k',k)
 print('n',n)
 
-boxes = int(solution.split('***')[3].split('-')[0].split(' ')[1])
+boxes = int(solution.split('***')[3].split('\n')[1].split(' ')[1])
 print('boxes',boxes)
 
 positions = solution.split('***')[1][len('positions:'):].split('\n')[1:-1]

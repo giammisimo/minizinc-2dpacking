@@ -10,9 +10,14 @@ OS=$(uname)
 
 if [[ "$OS" == "Linux" ]]; then
     # Percorso di MiniZincIDE su Linux
-    MZN_IDE_DIR=$(cat ./ide_path)
-    MINIZINC=$MZN_IDE_DIR/bin/minizinc
-    export MZN_STDLIB_DIR=$MZN_IDE_DIR/share/minizinc/
+    if [ -n "$1" ]; then
+        # If MZN_IDE_DIR is provided
+        MINIZINC=$1/bin/minizinc
+        export MZN_STDLIB_DIR=$1/share/minizinc/
+    else
+        # Use default minizinc if no MZN_IDE_DIR is provided
+        MINIZINC=minizinc
+    fi
 
     $MINIZINC --solver gecode.msc ./2dpacking_intervals.mzn example.dzn | tee sol.txt
     python3 plot.py
