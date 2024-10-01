@@ -9,6 +9,7 @@ int: n = (k * k) div (x * y); % upper bound
 array [1..n, 1..2] of var 1..k: positions;
 % Sizes for every box
 array [1..n, 1..2] of var {x, y}: sizes;
+% Number of boxes
 var 0..n: boxes;
 
 % x != y in sizes
@@ -30,10 +31,10 @@ constraint forall(i in 1..boxes)(
 
 % the boxes must not overlap
 constraint forall(i in 1..boxes, j in i+1..boxes) (
-  (positions[i,1] + sizes[i,1] - 1 < positions[j,1] \/
-   positions[j,1] + sizes[j,1] - 1 < positions[i,1] \/
-   positions[i,2] + sizes[i,2] - 1 < positions[j,2] \/
-   positions[j,2] + sizes[j,2] - 1 < positions[i,2])
+  (positions[i,1] + sizes[i,1] - 1 < positions[j,1] \/ % right border of i is left of j
+   positions[j,1] + sizes[j,1] - 1 < positions[i,1] \/ % right border of j is left of i
+   positions[i,2] + sizes[i,2] - 1 < positions[j,2] \/ % bottom border of i is above j
+   positions[j,2] + sizes[j,2] - 1 < positions[i,2])  % bottom border of j is above i
 );
 
 % Symmetry breaking 1: The first box must be at the origin (1,1)
