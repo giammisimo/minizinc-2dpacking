@@ -29,10 +29,38 @@ constraint forall(i in 1..boxes)(
 );
 
 %the boxes must not overlap
-constraint diffn_k(positions, sizes);
+%constraint diffn_k(positions, sizes);
+%this constraint generates much fewer subtrees
+constraint forall(i in 1..boxes, j in i+1..boxes) (
+  (positions[i,1] + sizes[i,1] - 1 < positions[j,1] \/
+   positions[j,1] + sizes[j,1] - 1 < positions[i,1] \/
+   positions[i,2] + sizes[i,2] - 1 < positions[j,2] \/
+   positions[j,2] + sizes[j,2] - 1 < positions[i,2])
+);
 
-%Symmetry breaking 1: The first box must be at the origin (1,1)
+% Symmetry breaking 1: The first box must be at the origin (1,1)
 constraint positions[1,1] = 1 /\ positions[1,2] = 1;
+
+% Symmetry breaking 2: The coordinates are always 1 mod 5
+constraint forall(i in 1..boxes)(
+  % More case specific
+  %positions[i,1] mod 5 = 1 /\ 
+  %positions[i,2] mod 5 = 1
+  % More general
+  (positions[i,1] mod x = 1 \/ positions[i,1] mod y = 1) /\ 
+  (positions[i,2] mod x = 1 \/ positions[i,2] mod y = 1)
+);
+
+% Symmetry breaking 3: The boxes at x = 0 are horizontal
+constraint forall(i in 1..(k div x))(
+  positions[i,2] = 1 /\ positions[i,1] = ((i-1) * x + 1)
+);
+
+% Symmetry breaking 4: Order the positions
+constraint forall(i in 1..boxes, j in i+1..boxes) (
+  ((positions[i,2]-1) * k + (positions[i,1]-1)) <= 
+  ((positions[j,2]-1) * k + (positions[j,1]-1))
+);
 
 solve maximize boxes;
 

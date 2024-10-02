@@ -2,7 +2,7 @@ import os
 import sys
 import platform
 
-number_of_benchmarks = 10
+number_of_benchmarks = 36
 MZN_FILE = sys.argv[1]
 
 # MacOS or Linux

@@ -83,7 +83,7 @@ class GridGUI:
                 self.canvas.create_rectangle(x1, y1, x2, y2, outline="black")
 
     def place_box(self, index: int, sizex: int, sizey: int, row: int, col: int):
-        color = self.square_colors[index]
+        color = self.square_colors[index % len(self.square_colors) + 1]
 
         x1 = col * self.cell_size
         y1 = row * self.cell_size
