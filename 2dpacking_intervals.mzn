@@ -53,13 +53,17 @@ constraint forall(i in 1..boxes)(
 
 % Symmetry breaking 3: The boxes at x = 0 are horizontal
 constraint forall(i in 1..(k div x))(
-  positions[i,2] = 1 /\ positions[i,1] = ((i-1) * x + 1)
+  positions[i,1] = 1 /\ positions[i,2] = ((i-1) * x + 1)
 );
 
 % Symmetry breaking 4: Order the positions
 constraint forall(i in 1..boxes, j in i+1..boxes) (
-  ((positions[i,2]-1) * k + (positions[i,1]-1)) <= 
-  ((positions[j,2]-1) * k + (positions[j,1]-1))
+  ((positions[i,1]-1) * k + (positions[i,2]-1)) <= 
+  ((positions[j,1]-1) * k + (positions[j,2]-1))
+);
+
+constraint forall(i in boxes+1..n) (
+  positions[i,1] = k /\ positions[i,2] = k
 );
 
 solve maximize boxes;
