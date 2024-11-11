@@ -59,7 +59,7 @@ def main():
         bench_path = f"{benchmark_folder}/{file_name}"
         
         if check_operating_system() == 'macos':
-            os.system(f"minizinc --solver Gecode ./{MZN_FILE} {bench_path} | tee ./benchmarks-results/{file_name_without_extension}.txt")
+            os.system(f"minizinc --solver Gecode ./{MZN_FILE} {bench_path} --time-limit 300000 | tee ./benchmarks-results/{file_name_without_extension}.txt")
         elif check_operating_system() == 'linux':
             
             if MZN_IDE_DIR := os.getenv('MZN'):
@@ -67,7 +67,7 @@ def main():
             else:
                 MINIZINC = 'minizinc'
 
-            os.system(f"{MINIZINC} --output-time --solver Gecode ./{MZN_FILE} {bench_path} | tee ./benchmarks-results/{file_name_without_extension}.txt")
+            os.system(f"{MINIZINC} --output-time --solver Gecode ./{MZN_FILE} {bench_path} --time-limit 300000 | tee ./benchmarks-results/{file_name_without_extension}.txt")
         else:
             print("Sistema operativo non supportato.")
             return
