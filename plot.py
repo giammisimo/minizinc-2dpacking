@@ -82,7 +82,7 @@ class GridGUI:
                 y2 = y1 + self.cell_size
                 self.canvas.create_rectangle(x1, y1, x2, y2, outline="black")
 
-    def place_box(self, index: int, sizey: int, sizex: int, col: int, row: int):
+    def place_box(self, index: int, sizex: int, sizey: int, col: int, row: int):
         color = self.square_colors[index % len(self.square_colors) + 1]
 
         x1 = col * self.cell_size
@@ -100,6 +100,6 @@ gui = GridGUI(k, 20)
 gui.draw_grid()
 
 for i in range(boxes):
-    gui.place_box(i+1,sizes[i][1],sizes[i][0],positions[i][0]-1,positions[i][1]-1)
+    gui.place_box(i,sizes[i][0],sizes[i][1],positions[i][0]-1,positions[i][1]-1)
 
 gui.run()

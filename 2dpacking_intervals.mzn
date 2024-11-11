@@ -52,8 +52,11 @@ constraint forall(i in 1..boxes)(
 );
 
 % Symmetry breaking 3: The boxes at x = 0 are horizontal
-constraint forall(i in 1..(k div x))(
-  positions[i,1] = 1 /\ positions[i,2] = ((i-1) * x + 1)
+constraint positions[1,1] = 1 /\ positions[1,2] = 1;
+
+constraint forall(i in 1..boxes, j in i+1..boxes)(
+  (positions[i,1] = positions[j,1]) -> 
+  (sizes[i,1] = sizes[j,1] /\ sizes[i,2] = sizes[j,2])
 );
 
 % Symmetry breaking 4: Order the positions
