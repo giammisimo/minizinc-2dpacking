@@ -2,7 +2,7 @@ include "globals.mzn";
 
 int: k;% = 19;
 int: x;% = 5;
-int: y = x + 5;
+int: y;% = x + 5;
 int: n = (k*k) div (x*y); %upper bound
 
 % Position of the upper-left corner of every box

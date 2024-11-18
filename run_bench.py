@@ -18,11 +18,11 @@ def check_operating_system():
 def read_mzn_file(mzn_file_path):
     # Works with benchmarks with the following pattern
     # k = [num1]; x = [num2];
-    vars = {'k':None, 'x':None}
+    vars = {'k':None, 'x':None, 'y':None}
     with open(mzn_file_path) as f:
         s = f.read()
         exec(s, None, vars)
-    return vars['k'], vars['x']
+    return vars['k'], vars['x'], vars['y']
 
 def can_continue(counter: int) -> bool:
     return counter < number_of_benchmarks
@@ -51,9 +51,9 @@ def main():
         
         mzn_file_path = os.path.join(benchmark_folder, file_name)
 
-        k, x = read_mzn_file(mzn_file_path)
+        k, x, y = read_mzn_file(mzn_file_path)
 
-        print(f'Running {mzn_file_path} with k = {k}, x = {x}, y = {x + 5}')      
+        print(f'Running {mzn_file_path} with k = {k}, x = {x}, y = {y}')      
 
         file_name_without_extension = file_name.split('.')[0]
         bench_path = f"{benchmark_folder}/{file_name}"
