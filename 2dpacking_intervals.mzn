@@ -52,8 +52,9 @@ constraint forall(i in 1..boxes)(
 );
 
 % Symmetry breaking 3: The boxes at x = 0 are horizontal
-constraint positions[1,1] = 1 /\ positions[1,2] = 1;
+constraint sizes[1,1] = max(x,y) /\ sizes[1,2] = min(x,y);
 
+% Force all boxes on the same column to have the same orientation
 constraint forall(i in 1..boxes, j in i+1..boxes)(
   (positions[i,1] = positions[j,1]) -> 
   (sizes[i,1] = sizes[j,1] /\ sizes[i,2] = sizes[j,2])
@@ -66,10 +67,16 @@ constraint forall(i in 1..boxes, j in i+1..boxes) (
 );
 
 constraint forall(i in boxes+1..n) (
-  positions[i,1] = k /\ positions[i,2] = k
+  positions[i,1] = k /\ positions[i,2] = k /\
+  sizes[i,1] = x /\ sizes[i,2] = y
 );
 
-solve :: int_search([boxes], input_order, indomain_max) maximize boxes;
+%solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
+solve :: seq_search([
+             int_search([boxes], first_fail, indomain_min),
+             int_search(positions, input_order, indomain_min)])
+      maximize boxes;
+%solve maximize boxes;
 
 output [
   "x: ", show(x), "\ny: " , show(y), "\nk: ", show(k), "\nn: ", show(n), "\n***\n",
