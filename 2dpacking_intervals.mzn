@@ -69,7 +69,7 @@ constraint forall(i in boxes+1..n) (
   positions[i,1] = k /\ positions[i,2] = k
 );
 
-solve maximize boxes;
+solve :: int_search([boxes], input_order, indomain_max) maximize boxes;
 
 output [
   "x: ", show(x), "\ny: " , show(y), "\nk: ", show(k), "\nn: ", show(n), "\n***\n",
