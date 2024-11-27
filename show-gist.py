@@ -1,35 +1,49 @@
 """
-Shows solution from Gecode.
-Takes a file path as input.
+Shows solution from Gist.
+Reads the file grid.txt.
 To launch
-python3 plot.py <solution>
+python3 show-gist.py <k> <x>
 """
-import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
-def read_solution(filename):
+def parse_minizinc_array(text):
     """
-    Read and parse the solution file
+    Parse a MiniZinc-style array declaration to extract values.
+    
+    Args:
+    text (str): The text containing the array declaration
+    
+    Returns:
+    tuple: (number of boxes, list of positions, list of sizes)
     """
-    with open(filename, 'r') as f:
-        solution = f.read()
+    # Extract number of boxes
+    boxes_line = [line for line in text.split('\n') if 'boxes' in line][0]
+    boxes = int(boxes_line.split('=')[1].strip().rstrip(';'))
     
-    # Parse parameters
-    parameters = solution.split('***')[0].split('\n')[:-1]
-    x, y, k, n = tuple([int(par.split(' ')[1]) for par in parameters])
+    # Extract positions
+    positions_line = [line for line in text.split('\n') if 'positions' in line][0]
+    positions_str = positions_line.split('[')[1].split(']')[0]
+    positions_raw = positions_str.split(', ')
     
-    # Parse boxes
-    boxes = int(solution.split('***')[3].split('\n')[1].split(' ')[1])
+    # Convert positions to (x,y) pairs
+    positions = []
+    for i in range(0, len(positions_raw), 2):
+        positions.append((int(positions_raw[i]), int(positions_raw[i+1])))
     
-    # Parse positions and sizes
-    positions = solution.split('***')[1][len('positions:'):].split('\n')[1:-1]
-    positions = [(int(pos.split(',')[0]),int(pos.split(',')[1])) for pos in positions[:boxes]]
+    # Extract sizes
+    sizes_line = [line for line in text.split('\n') if 'sizes' in line][0]
+    sizes_str = sizes_line.split('[')[1].split(']')[0]
+    sizes_raw = sizes_str.split(', ')
     
-    sizes = solution.split('***')[2][len('sizes:'):].split('\n')[1:-1]
-    sizes = [(int(size.split(',')[0]),int(size.split(',')[1])) for size in sizes[:boxes]]
+    # Convert sizes to (width, height) pairs
+    sizes = []
+    for i in range(0, len(sizes_raw), 2):
+        sizes.append((int(sizes_raw[i]), int(sizes_raw[i+1])))
     
-    return x, y, k, n, boxes, positions, sizes
+    return boxes, positions[:boxes], sizes[:boxes]
 
 def visualize_grid(x, y, k, boxes, positions, sizes):
     """
@@ -78,27 +92,24 @@ def visualize_grid(x, y, k, boxes, positions, sizes):
     
     return fig, ax
 
+# Example usage
 def main():
-    # Check if filename is provided
-    if len(sys.argv) < 2:
-        print("Please provide a solution file as an argument.")
-        sys.exit(1)
-    
-    # Read solution
-    x, y, k, n, boxes, positions, sizes = read_solution(sys.argv[1])
-    print(k,x,y)
-    print(n,boxes)
+    k, x = [int(i) for i in (sys.argv[1:3])]
+    y = x + 5
+
+    text = open('grid.txt','r').read()
+
+    #text = b'\n'.join(sys.stdin.readlines())
+    # Parse the text
+    boxes, positions, sizes = parse_minizinc_array(text)
+    print(boxes)
     print(positions)
     print(sizes)
-    
-    # Create visualization
+
     fig, ax = visualize_grid(x, y, k, boxes, positions, sizes)
-    
-    # Save the figure
-    #plt.savefig('grid_solution.png', dpi=300, bbox_inches='tight')
-    
-    # Display the figure
+    #plt.ion()
     plt.show()
+
 
 if __name__ == "__main__":
     main()
