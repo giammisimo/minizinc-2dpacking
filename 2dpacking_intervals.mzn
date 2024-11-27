@@ -73,8 +73,8 @@ constraint forall(i in boxes+1..n) (
 
 %solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
 solve :: seq_search([
-             int_search([boxes], first_fail, indomain_min),
-             int_search(positions, input_order, indomain_min)])
+             %int_search([boxes], first_fail, indomain_min),int_search(positions, input_order, indomain_min)])
+             int_search(positions, input_order, indomain_min), int_search([boxes], first_fail, indomain_min)])
       maximize boxes;
 %solve maximize boxes;
 
@@ -83,11 +83,11 @@ output [
   "positions:"
 ]
 ++
-[if j = 1 then "\n" endif ++
+[if j = 1 then "\n" else "" endif ++
   show(positions[i,j]) ++ "," | i in 1..n, j in 1..2
 ]
 ++["\n***\nsizes:"]++
-[if j = 1 then "\n" endif ++
+[if j = 1 then "\n" else "" endif ++
   show(sizes[i,j]) ++ "," | i in 1..n, j in 1..2
 ] ++ ["\n***\nboxes: ", show(boxes)]
 ;
