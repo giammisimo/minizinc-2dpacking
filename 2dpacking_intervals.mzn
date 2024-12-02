@@ -5,16 +5,11 @@ int: x;% = 5;
 int: y;% = x + 5;
 int: n = (k*k) div (x*y); %upper bound
 
-set of int: ValidPositions = {p | p in 1..k where p mod x = 1 \/ p mod y = 1};
-
 % Position of the upper-left corner of every box
-array [1..n, 1..2] of var ValidPositions: positions; 
+array [1..n,1..2] of var 1..k: positions; 
 % Sizes for every box
 array [1..n,1..2] of var {x,y}: sizes; 
 var 0..n: boxes;
-
-
-
 
 % x != y in sizes
 constraint forall(i in 1..boxes)(
@@ -47,14 +42,14 @@ constraint forall(i in 1..boxes, j in i+1..boxes) (
 constraint positions[1,1] = 1 /\ positions[1,2] = 1;
 
 % Symmetry breaking 2: The coordinates are always 1 mod 5
-%constraint forall(i in 1..boxes)(
+constraint forall(i in 1..boxes)(
   % More case specific
   %positions[i,1] mod 5 = 1 /\ 
   %positions[i,2] mod 5 = 1
   % More general
-  %(positions[i,1] mod x = 1 \/ positions[i,1] mod y = 1) /\ 
-  %(positions[i,2] mod x = 1 \/ positions[i,2] mod y = 1)
-%);
+  (positions[i,1] mod x = 1 \/ positions[i,1] mod y = 1) /\ 
+  (positions[i,2] mod x = 1 \/ positions[i,2] mod y = 1)
+);
 
 % Symmetry breaking 3: The boxes at x = 0 are horizontal
 constraint sizes[1,1] = max(x,y) /\ sizes[1,2] = min(x,y);
@@ -72,7 +67,7 @@ constraint forall(i in 1..boxes, j in i+1..boxes) (
 );
 
 constraint forall(i in boxes+1..n) (
-  positions[i,1] = 1 /\ positions[i,2] = 1 /\
+  positions[i,1] = k /\ positions[i,2] = k /\
   sizes[i,1] = x /\ sizes[i,2] = y
 );
 
