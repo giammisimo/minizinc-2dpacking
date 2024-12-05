@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  2dpacking:
+    build: .
+    container_name: "2dpacking"
+    ports:
+      - "0.0.0.0:7777:5000"
+    restart: unless-stopped
