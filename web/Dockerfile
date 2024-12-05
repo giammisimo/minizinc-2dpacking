@@ -2,7 +2,7 @@ FROM ubuntu:latest
 RUN apt update && apt install -y python3 python3-pip
 
 COPY ./src/requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
 COPY ./src /app
 WORKDIR /app
