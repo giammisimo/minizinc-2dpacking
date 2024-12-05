@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Text to Plot</title>
+</head>
+<body>
+    {% if plot_url %}
+        <img src="{{ plot_url }}" alt="Generated Plot" style="width: 600px; height: auto;">
+    {% endif %}
+
+    <form method="POST">
+        <textarea name="text_content" rows="10" cols="50" placeholder="Enter your text here...">{{ text_content }}</textarea><br>
+        <label for="k">K:</label>
+        <input type="text" id="k" name="k" value="{{ k_value }}" placeholder="Enter k"><br>
+
+	<label for="x">X:</label>
+        <input type="text" id="x" name="x" value="{{ x_value }}" placeholder="Enter x"><br>
+        
+        <label for="y">Y:</label>
+        <input type="text" id="y" name="y" value="{{ y_value }}" placeholder="Enter y"><br>
+        
+	<button type="submit">Generate Plot</button>
+    </form>
+</body>
+</html>
+
