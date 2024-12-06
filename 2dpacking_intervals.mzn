@@ -91,18 +91,13 @@ constraint
         adjacency[v, u] = adjacency[u, v] % Ensure symmetry for undirected graph
     );
     
+constraint forall(u in 1..n, v in 1..n)( 
+  (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
+);
+    
 constraint forall(i in 1..boxes)(
-  exists([adjacency[i,j] | j in 1..boxes])
-);
-
-var int: num_edges = sum(i,j in 1..boxes)(adjacency[i,j]);
-array [1..n*n] of var 1..n: from;
-array [1..n*n] of var 1..n: to;
-constraint forall(e in 1..num_edges)(
-  exists(i,j in 1..boxes)(adjacency[i,j] /\ from[e] = i /\ to[e] = j)
-);
-constraint forall(e in num_edges+1..n*n)(
-  from[e] = 1 /\ to[e] = 1
+  %exists([adjacency[i,j] | j in 1..boxes])
+  sum([adjacency[i,j] | j in 1..boxes]) > 1
 );
 
 

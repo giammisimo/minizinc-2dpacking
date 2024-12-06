@@ -87,11 +87,12 @@ constraint forall(u in 1..boxes, v in 1..boxes)(
 );
 
 constraint forall(u in 1..n, v in 1..n)( 
-  (u > boxes /\ v > boxes) -> (adjacency[u,v] = false)
+  (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
 );
     
 constraint forall(i in 1..boxes)(
-  exists([adjacency[i,j] | j in 1..boxes])
+  %exists([adjacency[i,j] | j in 1..boxes])
+  sum([adjacency[i,j] | j in 1..boxes]) > 2
 );
 
 
