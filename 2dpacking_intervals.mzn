@@ -71,6 +71,41 @@ constraint forall(i in boxes+1..n) (
   sizes[i,1] = x /\ sizes[i,2] = y
 );
 
+predicate edge_exists(int: u, int: v) =
+    (u != v) /\ (u <= boxes /\ v <= boxes) /\ (
+      (positions[u,1] + sizes[u,1] = positions[v,1] /\
+       ((positions[u,2] >= positions[v,2] /\ positions[u,2] < (positions[v,2] + sizes[v,2])) \/
+        (positions[v,2] >= positions[u,2] /\ positions[v,2] < (positions[u,2] + sizes[u,2])))) \/ 
+      (positions[u,2] + sizes[u,2] = positions[v,2] /\ 
+       ((positions[u,1] >= positions[v,1] /\ positions[u,1] < (positions[v,1] + sizes[v,1])) \/
+        (positions[v,1] >= positions[u,1] /\ positions[v,1] < (positions[u,1] + sizes[u,1]))))
+    );
+    
+array[1..n, 1..n] of var bool: adjacency; 
+%array [1..n*n] of 1..n: from;
+%array [1..n*n] of 1..n: to;   
+    
+constraint
+    forall(u in 1..n, v in 1..n where u < v) (
+        adjacency[u, v] = edge_exists(u, v) /\
+        adjacency[v, u] = adjacency[u, v] % Ensure symmetry for undirected graph
+    );
+    
+constraint forall(i in 1..boxes)(
+  exists([adjacency[i,j] | j in 1..boxes])
+);
+
+var int: num_edges = sum(i,j in 1..boxes)(adjacency[i,j]);
+array [1..n*n] of var 1..n: from;
+array [1..n*n] of var 1..n: to;
+constraint forall(e in 1..num_edges)(
+  exists(i,j in 1..boxes)(adjacency[i,j] /\ from[e] = i /\ to[e] = j)
+);
+constraint forall(e in num_edges+1..n*n)(
+  from[e] = 1 /\ to[e] = 1
+);
+
+
 %solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
 solve :: seq_search([
              %int_search([boxes], first_fail, indomain_min),int_search(positions, input_order, indomain_min)])
@@ -90,6 +125,10 @@ output [
 [if j = 1 then "\n" else "" endif ++
   show(sizes[i,j]) ++ "," | i in 1..n, j in 1..2
 ] ++ ["\n***\nboxes: ", show(boxes)]
+++["\n***\nadj:"]++
+[if j = 1 then "\n" else "" endif ++
+  show(adjacency[i,j]) ++ "," | i in 1..n, j in 1..n
+]
 ;
 % symmetry breaking
 % 1. One box must have a corner at the origin
