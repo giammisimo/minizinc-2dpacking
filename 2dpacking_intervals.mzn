@@ -95,16 +95,16 @@ constraint forall(u in 1..n, v in 1..n)(
   (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
 );
     
-constraint forall(i in 1..boxes)(
-  %exists([adjacency[i,j] | j in 1..boxes])
-  sum([adjacency[i,j] | j in 1..boxes]) > 1
-);
+%constraint forall(i in 1..boxes)(
+%  %exists([adjacency[i,j] | j in 1..boxes])
+%  sum([adjacency[i,j] | j in 1..boxes]) > 1
+%);
 
 
 %solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
 solve :: seq_search([
-             %int_search([boxes], first_fail, indomain_min),int_search(positions, input_order, indomain_min)])
-             int_search(positions, input_order, indomain_min), int_search([boxes], first_fail, indomain_min)])
+%             %int_search([boxes], first_fail, indomain_min),int_search(positions, input_order, indomain_min)])
+             int_search(positions, input_order, indomain_min),int_search([boxes], first_fail, indomain_max)])
       maximize boxes;
 %solve maximize boxes;
 

@@ -92,7 +92,29 @@ constraint forall(u in 1..n, v in 1..n)(
     
 constraint forall(i in 1..boxes)(
   %exists([adjacency[i,j] | j in 1..boxes])
-  sum([adjacency[i,j] | j in 1..boxes]) > 2
+  sum([adjacency[i,j] | j in 1..boxes]) > 1
+);
+
+predicate gcd(var int: x, var int: y, var int: g) =
+  let {
+    int: p = min(ub(x),ub(y))
+  } in
+   exists(i in 1..p) (
+       x mod i = 0 /\ y mod i = 0
+       /\
+       forall(j in i+1..p) (
+           not(x mod j = 0 /\ y mod j = 0)
+       )
+       /\
+       g = i
+   )
+;
+
+var int: d;
+constraint gcd(x,y,d);
+
+constraint forall(i in 1..boxes)(
+  ((positions[i,1]) mod d = 1) /\ ((positions[i,2]) mod d = 1)
 );
 
 
@@ -101,7 +123,8 @@ constraint boxes = sol;
 
 solve :: seq_search([
              %int_search([boxes], first_fail, indomain_min),int_search(positions, input_order, indomain_min)])
-             int_search(positions, input_order, indomain_min), int_search([boxes], first_fail, indomain_min)])
+             %int_search(positions, input_order, indomain_min), int_search([boxes], first_fail, indomain_min)])
+             int_search(positions, input_order, indomain_min), int_search(sizes, first_fail, indomain_max)])
       satisfy;
 
 output [
