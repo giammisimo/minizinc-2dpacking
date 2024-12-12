@@ -8,40 +8,39 @@ python3 show-gist.py <k> <x>
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import re
 
 def parse_minizinc_array(text):
     """
-    Parse a MiniZinc-style array declaration to extract values.
+    Parse a Gist node to extract values.
     
     Args:
-    text (str): The text containing the array declaration
+    text (str): The text containing the node content
     
     Returns:
     tuple: (number of boxes, list of positions, list of sizes)
     """
+
+    lines = text.split('\n')
+    lines = {line.split(' ')[0]:line for line in lines}
+
     # Extract number of boxes
-    boxes_line = [line for line in text.split('\n') if 'boxes' in line][0]
-    boxes = int(boxes_line.split('=')[1].strip().rstrip(';'))
+    boxes_line = lines['boxes']
+    boxes = int(re.findall('[0-9]+',boxes_line)[0])
     
     # Extract positions
-    positions_line = [line for line in text.split('\n') if 'positions' in line][0]
-    positions_str = positions_line.split('[')[1].split(']')[0]
-    positions_raw = positions_str.split(', ')
-    
-    # Convert positions to (x,y) pairs
-    positions = []
-    for i in range(0, len(positions_raw), 2):
-        positions.append((int(positions_raw[i]), int(positions_raw[i+1])))
+    positions_line = lines['positions']
+    positions_str = re.findall('\[[0-9, ]+',positions_line)[0] + ']'
+    positions_raw = eval(positions_str)
+    positions = [(int(positions_raw[i]), int(positions_raw[i+1])) for i in range(0, len(positions_raw), 2)]
     
     # Extract sizes
-    sizes_line = [line for line in text.split('\n') if 'sizes' in line][0]
-    sizes_str = sizes_line.split('[')[1].split(']')[0]
-    sizes_raw = sizes_str.split(', ')
-    
-    # Convert sizes to (width, height) pairs
-    sizes = []
-    for i in range(0, len(sizes_raw), 2):
-        sizes.append((int(sizes_raw[i]), int(sizes_raw[i+1])))
+    sizes_line = lines['sizes']
+    sizes_str = re.findall('\[[0-9, ]+',sizes_line)[0] + ']'
+    sizes_raw = eval(sizes_str)
+    sizes = [(int(sizes_raw[i]), int(sizes_raw[i+1])) for i in range(0, len(sizes_raw), 2)]
+
+    boxes = min(boxes, len(sizes), len(positions))
     
     return boxes, positions[:boxes], sizes[:boxes]
 
@@ -105,8 +104,7 @@ def visualize_grid(x, y, k, boxes, positions, sizes):
 
 # Example usage
 def main():
-    k, x = [int(i) for i in (sys.argv[1:3])]
-    y = x + 5
+    k, x, y = [int(i) for i in (sys.argv[1:4])]
 
     text = open('grid.txt','r').read()
 
