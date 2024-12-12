@@ -100,6 +100,43 @@ constraint forall(u in 1..n, v in 1..n)(
 %  sum([adjacency[i,j] | j in 1..boxes]) > 1
 %);
 
+predicate gcd(int: x, int: y, var int: g) =
+  let {
+    int: p = min(ub(x),ub(y))
+  } in
+   exists(i in 1..p) (
+       x mod i = 0 /\ y mod i = 0
+       /\
+       forall(j in i+1..p) (
+           not(x mod j = 0 /\ y mod j = 0)
+       )
+       /\
+       g = i
+   )
+;
+
+var int: modulo;
+constraint gcd(x,y,modulo);
+
+constraint forall(i in 1..boxes)(
+  modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
+);
+
+predicate inside_box(int: x, int: y) =
+(
+  exists(i in 1..boxes)(
+    (x >= positions[i,1] /\ x <= positions[i,1] + sizes[i,1]) /\
+    (y >= positions[i,2] /\ y <= positions[i,2] + sizes[i,2])
+  )
+);
+
+predicate concave_point(int: i, int: j) = (
+  i > 0 /\ j > 0 /\ i < k /\ j < k /\ not inside_box(i,j) /\
+  inside_box(i-1,j) /\ inside_box(i,j-1)
+);
+
+constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
+
 
 %solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
 solve :: seq_search([

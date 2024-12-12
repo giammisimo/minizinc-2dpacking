@@ -95,7 +95,7 @@ constraint forall(i in 1..boxes)(
   sum([adjacency[i,j] | j in 1..boxes]) > 1
 );
 
-predicate gcd(var int: x, var int: y, var int: g) =
+predicate gcd(int: x, int: y, var int: g) =
   let {
     int: p = min(ub(x),ub(y))
   } in
@@ -110,12 +110,27 @@ predicate gcd(var int: x, var int: y, var int: g) =
    )
 ;
 
-var int: d;
-constraint gcd(x,y,d);
+var int: modulo;
+constraint gcd(x,y,modulo);
 
 constraint forall(i in 1..boxes)(
-  ((positions[i,1]) mod d = 1) /\ ((positions[i,2]) mod d = 1)
+  modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
 );
+
+predicate inside_box(int: x, int: y) =
+(
+  exists(i in 1..boxes)(
+    (x >= positions[i,1] /\ x <= positions[i,1] + sizes[i,1]) /\
+    (y >= positions[i,2] /\ y <= positions[i,2] + sizes[i,2])
+  )
+);
+
+predicate concave_point(int: i, int: j) = (
+  i > 0 /\ j > 0 /\ i < k /\ j < k /\ not inside_box(i,j) /\
+  inside_box(i-1,j) /\ inside_box(i,j-1)
+);
+
+constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
 
 
 int:sol;
