@@ -3,44 +3,69 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import numpy as np
+import re
 
 app = Flask(__name__)
 
-def parse_minizinc_array(text):
+def parse_gist(text):
     """
-    Parse a MiniZinc-style array declaration to extract values.
+    Parse a Gist node to extract values.
     
     Args:
-    text (str): The text containing the array declaration
+    text (str): The text containing the node content
     
     Returns:
     tuple: (number of boxes, list of positions, list of sizes)
     """
+
+    lines = text.split('\n')
+    lines = {line.split(' ')[0]:line for line in lines}
+
     # Extract number of boxes
-    boxes_line = [line for line in text.split('\n') if 'boxes' in line][0]
-    boxes = int(boxes_line.split('=')[1].strip().rstrip(';'))
+    boxes_line = lines['boxes']
+    boxes = int(re.findall('[0-9]+',boxes_line)[0])
     
     # Extract positions
-    positions_line = [line for line in text.split('\n') if 'positions' in line][0]
-    positions_str = positions_line.split('[')[1].split(']')[0]
-    positions_raw = positions_str.split(', ')
-    
-    # Convert positions to (x,y) pairs
-    positions = []
-    for i in range(0, len(positions_raw), 2):
-        positions.append((int(positions_raw[i]), int(positions_raw[i+1])))
+    positions_line = lines['positions']
+    positions_str = re.findall('\[[0-9, ]+',positions_line)[0] + ']'
+    positions_raw = eval(positions_str)
+    positions = [(int(positions_raw[i]), int(positions_raw[i+1])) for i in range(0, len(positions_raw), 2)]
     
     # Extract sizes
-    sizes_line = [line for line in text.split('\n') if 'sizes' in line][0]
-    sizes_str = sizes_line.split('[')[1].split(']')[0]
-    sizes_raw = sizes_str.split(', ')
-    
-    # Convert sizes to (width, height) pairs
-    sizes = []
-    for i in range(0, len(sizes_raw), 2):
-        sizes.append((int(sizes_raw[i]), int(sizes_raw[i+1])))
+    sizes_line = lines['sizes']
+    sizes_str = re.findall('\[[0-9, ]+',sizes_line)[0] + ']'
+    sizes_raw = eval(sizes_str)
+    sizes = [(int(sizes_raw[i]), int(sizes_raw[i+1])) for i in range(0, len(sizes_raw), 2)]
+
+    boxes = min(boxes, len(sizes), len(positions))
     
     return boxes, positions[:boxes], sizes[:boxes]
+
+
+def parse_gecode(solution):
+    """
+    Read and parse the solution file
+    """    
+
+    # Parse boxes
+    boxes = int(solution.split('***')[3].split('\n')[1].split(' ')[1])
+    
+    # Parse positions and sizes
+    positions = solution.split('***')[1][len('positions:'):].split('\n')[1:-1]
+    positions = [(int(pos.split(',')[0]),int(pos.split(',')[1])) for pos in positions[:boxes]]
+    
+    sizes = solution.split('***')[2][len('sizes:'):].split('\n')[1:-1]
+    sizes = [(int(size.split(',')[0]),int(size.split(',')[1])) for size in sizes[:boxes]]
+    
+    boxes = min(boxes, len(sizes), len(positions))
+    
+    return boxes, positions[:boxes], sizes[:boxes]
+
+def parse_minizinc(text):
+    if '*' in text:
+        return parse_gecode(text)
+    else:
+        return parse_gist(text)
 
 def visualize_grid(x, y, k, boxes, positions, sizes):
     """
@@ -80,7 +105,7 @@ def visualize_grid(x, y, k, boxes, positions, sizes):
         center_x = pos[0] - 1 + size[0] / 2
         center_y = pos[1] - 1 + size[1] / 2
         fontsize = 20
-        ax.text(center_x, center_y, str(idx), 
+        ax.text(center_x, center_y, str(idx + 1), 
                 ha='center', va='center', 
                 fontweight='bold', 
                 fontsize=fontsize,
@@ -121,7 +146,7 @@ def index():
         except ValueError:
             x, y, k = 1, 1, 1  # Default to 1 if inputs are invalid
 
-        boxes, positions, sizes = parse_minizinc_array(text_content)
+        boxes, positions, sizes = parse_minizinc(text_content)
 
         fig, ax = visualize_grid(x, y, k, boxes, positions, sizes)
         

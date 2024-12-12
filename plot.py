@@ -63,6 +63,17 @@ def visualize_grid(x, y, k, boxes, positions, sizes):
                                    color=color, 
                                    alpha=0.7, 
                                    edgecolor='black'))
+        
+        # Add index text to the box
+        # Adjust font size based on box size to ensure visibility
+        center_x = pos[0] - 1 + size[0] / 2
+        center_y = pos[1] - 1 + size[1] / 2
+        fontsize = 20
+        ax.text(center_x, center_y, str(idx + 1), 
+                ha='center', va='center', 
+                fontweight='bold', 
+                fontsize=fontsize,
+                color='black')
     
     # Set plot properties
     ax.set_xlim(0, k)

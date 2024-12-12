@@ -10,7 +10,7 @@ array [1..n,1..2] of var 1..k: positions;
 % Sizes for every box
 array [1..n,1..2] of var {x,y}: sizes; 
 var 0..n: boxes;
-array [1..n] of var bool: adjacent;
+array[1..n, 1..n] of var bool: adjacency; 
 
 % x != y in sizes
 constraint forall(i in 1..boxes)(
@@ -43,23 +43,17 @@ constraint forall(i in 1..boxes, j in i+1..boxes) (
 constraint positions[1,1] = 1 /\ positions[1,2] = 1;
 
 % Symmetry breaking 2: The coordinates are always 1 mod 5
-constraint forall(i in 1..boxes)(
+%constraint forall(i in 1..boxes)(
   % More case specific
   %positions[i,1] mod 5 = 1 /\ 
   %positions[i,2] mod 5 = 1
   % More general
-  (positions[i,1] mod x = 1 \/ positions[i,1] mod y = 1) /\ 
-  (positions[i,2] mod x = 1 \/ positions[i,2] mod y = 1)
-);
+%  (positions[i,1] mod x = 1 \/ positions[i,1] mod y = 1) /\ 
+%  (positions[i,2] mod x = 1 \/ positions[i,2] mod y = 1)
+%);
 
 % Symmetry breaking 3: The boxes at x = 0 are horizontal
 constraint sizes[1,1] = max(x,y) /\ sizes[1,2] = min(x,y);
-
-% Force all boxes on the same column to have the same orientation
-constraint forall(i in 1..boxes, j in i+1..boxes)(
-  (positions[i,1] = positions[j,1]) -> 
-  (sizes[i,1] = sizes[j,1] /\ sizes[i,2] = sizes[j,2])
-);
 
 % Symmetry breaking 4: Order the positions
 constraint forall(i in 1..boxes, j in i+1..boxes) (
@@ -67,30 +61,85 @@ constraint forall(i in 1..boxes, j in i+1..boxes) (
   ((positions[j,1]-1) * k + (positions[j,2]-1))
 );
 
-
-% All unusable boxes are defaulted to a value
 constraint forall(i in boxes+1..n) (
   positions[i,1] = k /\ positions[i,2] = k /\
   sizes[i,1] = x /\ sizes[i,2] = y
-  /\ adjacent[i] = 1
 );
 
-% Adjacency
-constraint forall(i in 1..boxes, j in 1..boxes)(
-  ((positions[i,1] != positions[j,1] /\ positions[i,2] != positions[j,2]) /\
-  (positions[j,1] + sizes[j,1] = positions[i,1] /\
-  positions[j,2] + sizes[j,2] = positions[i,2])) ->
-  (adjacent[i] = 1 /\ adjacent[j] = 1) 
+predicate edge_exists(int: u, int: v) =
+    (u != v) /\ (u <= boxes /\ v <= boxes) /\ (
+      (positions[u,1] + sizes[u,1] = positions[v,1] /\
+       ((positions[u,2] >= positions[v,2] /\ positions[u,2] < (positions[v,2] + sizes[v,2])) \/
+        (positions[v,2] >= positions[u,2] /\ positions[v,2] < (positions[u,2] + sizes[u,2])))) \/ 
+      (positions[u,2] + sizes[u,2] = positions[v,2] /\ 
+       ((positions[u,1] >= positions[v,1] /\ positions[u,1] < (positions[v,1] + sizes[v,1])) \/
+        (positions[v,1] >= positions[u,1] /\ positions[v,1] < (positions[u,1] + sizes[u,1]))))
+    );
+    
+  
+constraint
+    forall(u in 1..boxes, v in 1..boxes where u < v) (
+        adjacency[u, v] = edge_exists(u, v)
+    );
+    
+constraint forall(u in 1..boxes, v in 1..boxes)( 
+  adjacency[v, u] = adjacency[u, v]
 );
 
-constraint 
+constraint forall(u in 1..n, v in 1..n)( 
+  (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
+);
+    
+constraint forall(i in 1..boxes)(
+  %exists([adjacency[i,j] | j in 1..boxes])
+  sum([adjacency[i,j] | j in 1..boxes]) > 1
+);
+
+predicate gcd(int: x, int: y, var int: g) =
+  let {
+    int: p = min(ub(x),ub(y))
+  } in
+   exists(i in 1..p) (
+       x mod i = 0 /\ y mod i = 0
+       /\
+       forall(j in i+1..p) (
+           not(x mod j = 0 /\ y mod j = 0)
+       )
+       /\
+       g = i
+   )
+;
+
+var int: modulo;
+constraint gcd(x,y,modulo);
+
+constraint forall(i in 1..boxes)(
+  modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
+);
+
+predicate inside_box(int: x, int: y) =
+(
+  exists(i in 1..boxes)(
+    (x >= positions[i,1] /\ x <= positions[i,1] + sizes[i,1]) /\
+    (y >= positions[i,2] /\ y <= positions[i,2] + sizes[i,2])
+  )
+);
+
+predicate concave_point(int: i, int: j) = (
+  i > 0 /\ j > 0 /\ i < k /\ j < k /\ not inside_box(i,j) /\
+  inside_box(i-1,j) /\ inside_box(i,j-1)
+);
+
+constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
+
 
 int:sol;
 constraint boxes = sol;
 
 solve :: seq_search([
              %int_search([boxes], first_fail, indomain_min),int_search(positions, input_order, indomain_min)])
-             int_search(positions, input_order, indomain_min), int_search([boxes], first_fail, indomain_min)])
+             %int_search(positions, input_order, indomain_min), int_search([boxes], first_fail, indomain_min)])
+             int_search(positions, input_order, indomain_min), int_search(sizes, first_fail, indomain_max)])
       satisfy;
 
 output [
@@ -105,7 +154,10 @@ output [
 [if j = 1 then "\n" else "" endif ++
   show(sizes[i,j]) ++ "," | i in 1..n, j in 1..2
 ] ++ ["\n***\nboxes: ", show(boxes)]
-++ ["\n***\nadjacent: ", show(adjacent)]
+++["\n***\nadj:"]++
+[if j = 1 then "\n" else "" endif ++
+  show(adjacency[i,j]) ++ "," | i in 1..n, j in 1..n
+]
 ;
 % symmetry breaking
 % 1. One box must have a corner at the origin
