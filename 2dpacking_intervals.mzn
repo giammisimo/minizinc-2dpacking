@@ -18,8 +18,8 @@ constraint forall(i in 1..boxes)(
 
 % the boxes' corner must be inside the pallet
 constraint forall(i in 1..boxes)(
-  positions[i,1] > 0 /\ positions[i,1] <= k /\
-  positions[i,2] > 0 /\ positions[i,2] <= k
+  positions[i,1] > 0 /\ positions[i,1] <= k + 1 /\
+  positions[i,2] > 0 /\ positions[i,2] <= k + 1
 );
 
 %every box must be inside the pallet
@@ -81,20 +81,20 @@ predicate edge_exists(int: u, int: v) =
         (positions[v,1] >= positions[u,1] /\ positions[v,1] < (positions[u,1] + sizes[u,1]))))
     );
     
-array[1..n, 1..n] of var bool: adjacency; 
+%array[1..n, 1..n] of var bool: adjacency; 
 %array [1..n*n] of 1..n: from;
 %array [1..n*n] of 1..n: to;   
     
-constraint
-    forall(u in 1..n, v in 1..n where u < v) (
-        adjacency[u, v] = edge_exists(u, v) /\
-        adjacency[v, u] = adjacency[u, v] % Ensure symmetry for undirected graph
-    );
-    
-constraint forall(u in 1..n, v in 1..n)( 
-  (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
-);
-    
+%constraint
+%    forall(u in 1..n, v in 1..n where u < v) (
+%        adjacency[u, v] = edge_exists(u, v) /\
+%        adjacency[v, u] = adjacency[u, v] % Ensure symmetry for undirected graph
+%    );
+%    
+%constraint forall(u in 1..n, v in 1..n)( 
+%  (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
+%);
+%    
 %constraint forall(i in 1..boxes)(
 %  %exists([adjacency[i,j] | j in 1..boxes])
 %  sum([adjacency[i,j] | j in 1..boxes]) > 1
@@ -115,7 +115,7 @@ predicate gcd(int: x, int: y, var int: g) =
    )
 ;
 
-var int: modulo;
+var 1..min(x,y): modulo;
 constraint gcd(x,y,modulo);
 
 constraint forall(i in 1..boxes)(
@@ -135,7 +135,7 @@ predicate concave_point(int: i, int: j) = (
   inside_box(i-1,j) /\ inside_box(i,j-1)
 );
 
-constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
+%constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
 
 
 %solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
@@ -157,10 +157,10 @@ output [
 [if j = 1 then "\n" else "" endif ++
   show(sizes[i,j]) ++ "," | i in 1..n, j in 1..2
 ] ++ ["\n***\nboxes: ", show(boxes)]
-++["\n***\nadj:"]++
-[if j = 1 then "\n" else "" endif ++
-  show(adjacency[i,j]) ++ "," | i in 1..n, j in 1..n
-]
+%++["\n***\nadj:"]++
+%[if j = 1 then "\n" else "" endif ++
+%  show(adjacency[i,j]) ++ "," | i in 1..n, j in 1..n
+%]
 ;
 % symmetry breaking
 % 1. One box must have a corner at the origin
