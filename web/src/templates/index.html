@@ -1,76 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask Text to Plot</title>
     <style>
+        :root {
+            --background-color: #e0e0e0;
+            --text-color: #555;
+            --form-background: #e0e0e0;
+            --input-text-color: #000;
+            --shadow-light: #ffffff;
+            --shadow-dark: #bebebe;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            background-color: var(--background-color);
+            color: var(--text-color);
             padding: 20px;
         }
 
         form {
-            background-color: #fff;
+            width: 1000px;
+            background-color: var(--form-background);
             padding: 20px;
-            border-radius: 5px;
-            max-width: 600px;
+            border-radius: 10px;
+            max-width: 90%;
             margin: auto;
+            box-shadow: 20px 20px 60px var(--shadow-dark),
+                        -20px -20px 60px var(--shadow-light);
         }
 
-        textarea {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
+        textarea,
         input[type="text"] {
+            width: calc(100% - 20px);
+            margin-bottom: 20px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: var(--form-background);
+            color: var(--input-text-color);
+            box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                        inset -5px -5px 10px var(--shadow-light);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
             width: 100%;
-            margin-bottom: 10px;
-            padding: 8px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: var(--form-background);
+            box-shadow: 5px 5px 10px var(--shadow-dark),
+                        -5px -5px 10px var(--shadow-light);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:active {
+            box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                        inset -5px -5px 10px var(--shadow-light);
         }
 
         label {
             display: block;
-            margin-top: 10px;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #45a049;
+            margin-bottom: 10px;
+            font-weight: bold;
         }
 
         img {
+            width: 600px;
             max-width: 100%;
             height: auto;
             display: block;
             margin: 20px auto;
-            width: 600px;
+            border-radius: 10px;
+            box-shadow: 10px 10px 30px var(--shadow-dark),
+                        -10px -10px 30px var(--shadow-light);
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .toggle-container label {
+            cursor: pointer;
+            font-weight: normal;
         }
     </style>
 </head>
+
 <body>
+    <div class="toggle-container">
+        <label for="darkModeToggle">
+            <input type="checkbox" id="darkModeToggle">
+            Modalità Scura
+        </label>
+    </div>
+
     {% if plot_url %}
-        <img src="{{ plot_url }}" alt="Generated Plot">
+    <img src="{{ plot_url }}" alt="Generated Plot">
     {% endif %}
 
     <form method="POST">
-        <textarea name="text_content" rows="10" placeholder="Enter your text here...">{{ text_content }}</textarea>
+        <label for="text_content">Testo:</label>
+        <textarea id="text_content" name="text_content" rows="10"
+            placeholder="Inserisci il tuo testo...">{{ text_content }}</textarea>
         <label for="k">K:</label>
-        <input type="text" id="k" name="k" value="{{ k_value }}" placeholder="Enter k">
+        <input type="text" id="k" name="k" value="{{ k_value }}" placeholder="Inserisci k">
         <label for="x">X:</label>
-        <input type="text" id="x" name="x" value="{{ x_value }}" placeholder="Enter x">
+        <input type="text" id="x" name="x" value="{{ x_value }}" placeholder="Inserisci x">
         <label for="y">Y:</label>
-        <input type="text" id="y" name="y" value="{{ y_value }}" placeholder="Enter y">
-        <button type="submit">Generate Plot</button>
+        <input type="text" id="y" name="y" value="{{ y_value }}" placeholder="Inserisci y">
+        <button type="submit">Genera Plot</button>
     </form>
+
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('change', () => {
+            if (darkModeToggle.checked) {
+                document.documentElement.style.setProperty('--background-color', '#333');
+                document.documentElement.style.setProperty('--text-color', '#ddd');
+                document.documentElement.style.setProperty('--form-background', '#444');
+                document.documentElement.style.setProperty('--input-text-color', '#fff');
+                document.documentElement.style.setProperty('--shadow-light', '#555');
+                document.documentElement.style.setProperty('--shadow-dark', '#222');
+            } else {
+                document.documentElement.style.setProperty('--background-color', '#e0e0e0');
+                document.documentElement.style.setProperty('--text-color', '#555');
+                document.documentElement.style.setProperty('--form-background', '#e0e0e0');
+                document.documentElement.style.setProperty('--input-text-color', '#000');
+                document.documentElement.style.setProperty('--shadow-light', '#ffffff');
+                document.documentElement.style.setProperty('--shadow-dark', '#bebebe');
+            }
+        });
+    </script>
 </body>
+
 </html>
