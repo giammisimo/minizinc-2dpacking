@@ -4,25 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask Text to Plot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        textarea {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            width: 600px;
+        }
+    </style>
 </head>
 <body>
     {% if plot_url %}
-        <img src="{{ plot_url }}" alt="Generated Plot" style="width: 600px; height: auto;">
+        <img src="{{ plot_url }}" alt="Generated Plot">
     {% endif %}
 
     <form method="POST">
-        <textarea name="text_content" rows="10" cols="50" placeholder="Enter your text here...">{{ text_content }}</textarea><br>
+        <textarea name="text_content" rows="10" placeholder="Enter your text here...">{{ text_content }}</textarea>
         <label for="k">K:</label>
-        <input type="text" id="k" name="k" value="{{ k_value }}" placeholder="Enter k"><br>
-
-	<label for="x">X:</label>
-        <input type="text" id="x" name="x" value="{{ x_value }}" placeholder="Enter x"><br>
-        
+        <input type="text" id="k" name="k" value="{{ k_value }}" placeholder="Enter k">
+        <label for="x">X:</label>
+        <input type="text" id="x" name="x" value="{{ x_value }}" placeholder="Enter x">
         <label for="y">Y:</label>
-        <input type="text" id="y" name="y" value="{{ y_value }}" placeholder="Enter y"><br>
-        
-	<button type="submit">Generate Plot</button>
+        <input type="text" id="y" name="y" value="{{ y_value }}" placeholder="Enter y">
+        <button type="submit">Generate Plot</button>
     </form>
 </body>
 </html>
-

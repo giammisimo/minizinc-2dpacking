@@ -71,6 +71,7 @@ constraint forall(i in boxes+1..n) (
   sizes[i,1] = x /\ sizes[i,2] = y
 );
 
+% Predicate: Check if two boxes are adjacent
 predicate edge_exists(int: u, int: v) =
     (u != v) /\ (u <= boxes /\ v <= boxes) /\ (
       (positions[u,1] + sizes[u,1] = positions[v,1] /\
@@ -81,25 +82,30 @@ predicate edge_exists(int: u, int: v) =
         (positions[v,1] >= positions[u,1] /\ positions[v,1] < (positions[u,1] + sizes[u,1]))))
     );
     
-%array[1..n, 1..n] of var bool: adjacency; 
+% The adjacency matrix for the graph
+array[1..n, 1..n] of var bool: adjacency; 
 %array [1..n*n] of 1..n: from;
 %array [1..n*n] of 1..n: to;   
+
+% The adjacency matrix must be symmetric, if u is adjacent to v, then v is adjacent to u
+constraint
+    forall(u in 1..n, v in 1..n where u < v) (
+        adjacency[u, v] = edge_exists(u, v) /\
+        adjacency[v, u] = adjacency[u, v] % Ensure symmetry for undirected graph
+    );
+
+% Not valid connections shall not be adjacent
+constraint forall(u in 1..n, v in 1..n)( 
+  (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
+);
     
-%constraint
-%    forall(u in 1..n, v in 1..n where u < v) (
-%        adjacency[u, v] = edge_exists(u, v) /\
-%        adjacency[v, u] = adjacency[u, v] % Ensure symmetry for undirected graph
-%    );
-%    
-%constraint forall(u in 1..n, v in 1..n)( 
-%  (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
-%);
-%    
+
 %constraint forall(i in 1..boxes)(
 %  %exists([adjacency[i,j] | j in 1..boxes])
 %  sum([adjacency[i,j] | j in 1..boxes]) > 1
 %);
 
+% Predicate: Maximin common divisor
 predicate gcd(int: x, int: y, var int: g) =
   let {
     int: p = min(ub(x),ub(y))
@@ -118,10 +124,12 @@ predicate gcd(int: x, int: y, var int: g) =
 var 1..min(x,y): modulo;
 constraint gcd(x,y,modulo);
 
+% If MCD is greater than 1, then the boxes must be placed at coordinates that are 1 mod MCD
 constraint forall(i in 1..boxes)(
   modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
 );
 
+% Predicate: Check if a point is inside a box
 predicate inside_box(int: x, int: y) =
 (
   exists(i in 1..boxes)(
@@ -130,12 +138,15 @@ predicate inside_box(int: x, int: y) =
   )
 );
 
+% Predicate: Check if a point is a concave point
+% A point is concave if it is not inside a box and its neighbors are
 predicate concave_point(int: i, int: j) = (
   i > 0 /\ j > 0 /\ i < k /\ j < k /\ not inside_box(i,j) /\
   inside_box(i-1,j) /\ inside_box(i,j-1)
 );
 
-%constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
+% The number of concave points must be less than 2
+constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
 
 
 %solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
