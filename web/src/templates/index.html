@@ -20,14 +20,34 @@
             background-color: var(--background-color);
             color: var(--text-color);
             padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .image-container {
+            flex: 0 1 600px;
+            max-width: 80%;
+        }
+
+        .form-container {
+            flex: 0 1 1000px;
+            max-width: 90%;
         }
 
         form {
-            width: 1000px;
             background-color: var(--form-background);
             padding: 20px;
             border-radius: 10px;
-            max-width: 90%;
+            max-width: 70%;
             margin: auto;
             box-shadow: 20px 20px 60px var(--shadow-dark),
                         -20px -20px 60px var(--shadow-light);
@@ -46,6 +66,10 @@
                         inset -5px -5px 10px var(--shadow-light);
             font-size: 16px;
             box-sizing: border-box;
+        }
+        
+        textarea{
+            height: 400px;
         }
 
         button {
@@ -93,6 +117,23 @@
             cursor: pointer;
             font-weight: normal;
         }
+
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .image-container,
+            .form-container {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            form {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -104,22 +145,31 @@
         </label>
     </div>
 
-    {% if plot_url %}
-    <img src="{{ plot_url }}" alt="Generated Plot">
-    {% endif %}
-
-    <form method="POST">
-        <label for="text_content">Testo:</label>
-        <textarea id="text_content" name="text_content" rows="10"
-            placeholder="Inserisci il tuo testo...">{{ text_content }}</textarea>
-        <label for="k">K:</label>
-        <input type="text" id="k" name="k" value="{{ k_value }}" placeholder="Inserisci k">
-        <label for="x">X:</label>
-        <input type="text" id="x" name="x" value="{{ x_value }}" placeholder="Inserisci x">
-        <label for="y">Y:</label>
-        <input type="text" id="y" name="y" value="{{ y_value }}" placeholder="Inserisci y">
-        <button type="submit">Genera Plot</button>
-    </form>
+    <div class="container">
+        <div class="image-container">
+            {% if plot_url %}
+            <img src="{{ plot_url }}" alt="Generated Plot">
+            {% endif %}
+        </div>
+        
+        <div class="form-container">
+            <form method="POST">
+                <label for="text_content">Testo:</label>
+                <textarea id="text_content" name="text_content" rows="10" placeholder="Inserisci il tuo testo...">{{ text_content }}</textarea>
+                
+                <label for="k">K:</label>
+                <input type="text" id="k" name="k" value="{{ k_value }}" placeholder="Inserisci k">
+                
+                <label for="x">X:</label>
+                <input type="text" id="x" name="x" value="{{ x_value }}" placeholder="Inserisci x">
+                
+                <label for="y">Y:</label>
+                <input type="text" id="y" name="y" value="{{ y_value }}" placeholder="Inserisci y">
+                
+                <button type="submit">Genera Plot</button>
+            </form>
+        </div>
+    </div>
 
     <script>
         // Funzioni per gestire i cookie
