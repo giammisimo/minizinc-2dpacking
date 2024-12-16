@@ -146,9 +146,13 @@ def index():
         except ValueError:
             x, y, k = 1, 1, 1  # Default to 1 if inputs are invalid
 
-        boxes, positions, sizes = parse_minizinc(text_content)
-
-        fig, ax = visualize_grid(x, y, k, boxes, positions, sizes)
+        if not text_content:
+            fig, ax = plt.subplots()
+            ax.text(0.5, 0.5, 'Errore: text_content mancante', fontsize=12, ha='center')
+            ax.axis('off')
+        else:
+            boxes, positions, sizes = parse_minizinc(text_content)
+            fig, ax = visualize_grid(x, y, k, boxes, positions, sizes)
         
         buf = io.BytesIO()
         plt.tight_layout()
