@@ -121,9 +121,33 @@
     </form>
 
     <script>
+        // Funzioni per gestire i cookie
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + d.toUTCString();
+            document.cookie = `${name}=${value};${expires};path=/`;
+        }
+    
+        function getCookie(name) {
+            const cname = name + "=";
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const cookieArray = decodedCookie.split(';');
+            for (let i = 0; i < cookieArray.length; i++) {
+                let c = cookieArray[i].trim();
+                if (c.indexOf(cname) === 0) {
+                    return c.substring(cname.length, c.length);
+                }
+            }
+            return "";
+        }
+    
+        // Gestione modalità scura
         const darkModeToggle = document.getElementById('darkModeToggle');
-        darkModeToggle.addEventListener('change', () => {
-            if (darkModeToggle.checked) {
+    
+        // Funzione per applicare la modalità scura
+        function applyDarkMode(isDark) {
+            if (isDark) {
                 document.documentElement.style.setProperty('--background-color', '#333');
                 document.documentElement.style.setProperty('--text-color', '#ddd');
                 document.documentElement.style.setProperty('--form-background', '#444');
@@ -138,8 +162,23 @@
                 document.documentElement.style.setProperty('--shadow-light', '#ffffff');
                 document.documentElement.style.setProperty('--shadow-dark', '#bebebe');
             }
+            // Aggiorna il toggle
+            darkModeToggle.checked = isDark;
+        }
+    
+        // Controlla il cookie all'avvio
+        const darkModeCookie = getCookie("darkMode");
+        if (darkModeCookie) {
+            applyDarkMode(darkModeCookie === "true");
+        }
+    
+        // Event listener per cambiare modalità
+        darkModeToggle.addEventListener('change', () => {
+            const isDark = darkModeToggle.checked;
+            applyDarkMode(isDark);
+            setCookie("darkMode", isDark, 7); // Salva la preferenza per 7 giorni
         });
-    </script>
+    </script>    
 </body>
 
 </html>
