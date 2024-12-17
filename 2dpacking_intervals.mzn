@@ -1,9 +1,8 @@
 include "globals.mzn";
 
-int: k;% = 19;
-int: x;% = 5;
-int: y;% = x + 5;
-int: n = (k*k) div (x*y); %upper bound
+int: k;        % Size of the pallet
+int: x; int: y;% Dimensions of the boxes
+int: n = (k*k) div (x*y); % Upper bound for the boxes
 
 % Position of the upper-left corner of every box
 array [1..n,1..2] of var 1..k: positions; 
@@ -30,42 +29,27 @@ constraint forall(i in 1..boxes)(
 
 %the boxes must not overlap
 %constraint diffn_k(positions, sizes);
-%this constraint generates much fewer subtrees
-constraint forall(i in 1..boxes, j in i+1..boxes) (
+%diffn for 2 dimensions
+constraint forall(i in 1..boxes, j in 1..boxes where i < j) (
   (positions[i,1] + sizes[i,1] - 1 < positions[j,1] \/
    positions[j,1] + sizes[j,1] - 1 < positions[i,1] \/
    positions[i,2] + sizes[i,2] - 1 < positions[j,2] \/
    positions[j,2] + sizes[j,2] - 1 < positions[i,2])
 );
 
-% Symmetry breaking 1: The first box must be at the origin (1,1)
-constraint positions[1,1] = 1 /\ positions[1,2] = 1;
+% Symmetry breaking 1: The first box must be at the origin (1,1) and is horizontal
+constraint (
+  positions[1,1] = 1 /\ positions[1,2] = 1 /\
+  sizes[1,1] = max(x,y) /\ sizes[1,2] = min(x,y)
+);
 
-% Symmetry breaking 2: The coordinates are always 1 mod 5
-%constraint forall(i in 1..boxes)(
-  % More case specific
-  %positions[i,1] mod 5 = 1 /\ 
-  %positions[i,2] mod 5 = 1
-  % More general
-  %(positions[i,1] mod x = 1 \/ positions[i,1] mod y = 1) /\ 
-  %(positions[i,2] mod x = 1 \/ positions[i,2] mod y = 1)
-%);
-
-% Symmetry breaking 3: The boxes at x = 0 are horizontal
-constraint sizes[1,1] = max(x,y) /\ sizes[1,2] = min(x,y);
-
-% Force all boxes on the same column to have the same orientation
-%constraint forall(i in 1..boxes, j in i+1..boxes)(
-%  (positions[i,1] = positions[j,1]) -> 
-%  (sizes[i,1] = sizes[j,1] /\ sizes[i,2] = sizes[j,2])
-%);
-
-% Symmetry breaking 4: Order the positions
+% Symmetry breaking 2: Order the positions
 constraint forall(i in 1..boxes, j in i+1..boxes) (
   ((positions[i,1]-1) * k + (positions[i,2]-1)) <= 
   ((positions[j,1]-1) * k + (positions[j,2]-1))
 );
 
+% All spare values that do not represent a box are defaulted
 constraint forall(i in boxes+1..n) (
   positions[i,1] = k /\ positions[i,2] = k /\
   sizes[i,1] = x /\ sizes[i,2] = y
@@ -83,29 +67,26 @@ predicate edge_exists(int: u, int: v) =
     );
     
 % The adjacency matrix for the graph
-array[1..n, 1..n] of var bool: adjacency; 
-%array [1..n*n] of 1..n: from;
-%array [1..n*n] of 1..n: to;   
+%array[1..n, 1..n] of var bool: adjacency;  
 
 % The adjacency matrix must be symmetric, if u is adjacent to v, then v is adjacent to u
-constraint
-    forall(u in 1..n, v in 1..n where u < v) (
-        adjacency[u, v] = edge_exists(u, v) /\
-        adjacency[v, u] = adjacency[u, v] % Ensure symmetry for undirected graph
-    );
+%constraint
+%    forall(u in 1..n, v in 1..n where u < v) (
+%        adjacency[u, v] = edge_exists(u, v) /\
+%        adjacency[v, u] = adjacency[u, v] % Ensure symmetry for undirected graph
+%    );
 
 % Not valid connections shall not be adjacent
-constraint forall(u in 1..n, v in 1..n)( 
-  (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
-);
+%constraint forall(u in 1..n, v in 1..n)( 
+%  (u > boxes \/ v > boxes \/ u = v) -> (adjacency[u,v] = false)
+%);
     
-
+% 
 %constraint forall(i in 1..boxes)(
-%  %exists([adjacency[i,j] | j in 1..boxes])
 %  sum([adjacency[i,j] | j in 1..boxes]) > 1
 %);
 
-% Predicate: Maximin common divisor
+% Predicate: Greatest common divisor
 predicate gcd(int: x, int: y, var int: g) =
   let {
     int: p = min(ub(x),ub(y))
@@ -124,7 +105,7 @@ predicate gcd(int: x, int: y, var int: g) =
 var 1..min(x,y): modulo;
 constraint gcd(x,y,modulo);
 
-% If MCD is greater than 1, then the boxes must be placed at coordinates that are 1 mod MCD
+% If GCD is greater than 1, then the boxes must be placed at coordinates that are 1 mod GCD
 constraint forall(i in 1..boxes)(
   modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
 );
@@ -146,13 +127,13 @@ predicate concave_point(int: i, int: j) = (
 );
 
 % The number of concave points must be less than 2
-constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
+%constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
 
 
 %solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
 solve :: seq_search([
 %             %int_search([boxes], first_fail, indomain_min),int_search(positions, input_order, indomain_min)])
-             int_search(positions, input_order, indomain_min),int_search([boxes], first_fail, indomain_max)])
+             int_search(positions, input_order, indomain_min),int_search(sizes, input_order, indomain_max)])
       maximize boxes;
 %solve maximize boxes;
 
