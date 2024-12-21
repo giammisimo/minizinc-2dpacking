@@ -17,14 +17,14 @@ constraint forall(i in 1..boxes)(
 
 % the boxes' corner must be inside the pallet
 constraint forall(i in 1..boxes)(
-  positions[i,1] > 0 /\ positions[i,1] <= k + 1 /\
-  positions[i,2] > 0 /\ positions[i,2] <= k + 1
+  positions[i,1] > 0 /\ positions[i,1] <= k /\
+  positions[i,2] > 0 /\ positions[i,2] <= k
 );
 
 %every box must be inside the pallet
 constraint forall(i in 1..boxes)(
-  positions[i,1] + sizes[i,1] <= k /\
-  positions[i,2] + sizes[i,2] <= k
+  positions[i,1] + sizes[i,1] <= k + 1 /\
+  positions[i,2] + sizes[i,2] <= k + 1
 );
 
 %the boxes must not overlap
