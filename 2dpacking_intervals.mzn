@@ -17,14 +17,14 @@ constraint forall(i in 1..boxes)(
 
 % the boxes' corner must be inside the pallet
 constraint forall(i in 1..boxes)(
-  positions[i,1] > 0 /\ positions[i,1] <= k + 1 /\
-  positions[i,2] > 0 /\ positions[i,2] <= k + 1
+  positions[i,1] > 0 /\ positions[i,1] <= k /\
+  positions[i,2] > 0 /\ positions[i,2] <= k
 );
 
 %every box must be inside the pallet
 constraint forall(i in 1..boxes)(
-  positions[i,1] + sizes[i,1] <= k /\
-  positions[i,2] + sizes[i,2] <= k
+  positions[i,1] + sizes[i,1] <= k + 1 /\
+  positions[i,2] + sizes[i,2] <= k + 1
 );
 
 %the boxes must not overlap
@@ -44,7 +44,7 @@ constraint (
 );
 
 % Symmetry breaking 2: Order the positions
-constraint forall(i in 1..boxes, j in i+1..boxes) (
+constraint forall(i in 1..boxes, j in 1..boxes where i < j) (
   ((positions[i,1]-1) * k + (positions[i,2]-1)) <= 
   ((positions[j,1]-1) * k + (positions[j,2]-1))
 );
@@ -106,9 +106,9 @@ var 1..min(x,y): modulo;
 constraint gcd(x,y,modulo);
 
 % If GCD is greater than 1, then the boxes must be placed at coordinates that are 1 mod GCD
-constraint forall(i in 1..boxes)(
-  modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
-);
+%constraint forall(i in 1..boxes)(
+%  modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
+%);
 
 % Predicate: Check if a point is inside a box
 predicate inside_box(int: x, int: y) =
@@ -129,10 +129,16 @@ predicate concave_point(int: i, int: j) = (
 % The number of concave points must be less than 2
 %constraint sum(i in 1..k, j in 1..k)(concave_point(i,j)) < 2;
 
+%var 100..n*100: target;
+%constraint target = boxes * 100 - (max([positions[i,1] | i in 1..boxes]) + max([positions[i,2] | i in 1..boxes]));
+%constraint target = boxes * 100 - (sum([sizes[i,1] < sizes[i,2] | i in 1..boxes]));
+
+constraint sum([sizes[i,1] > sizes[i,2] | i in 1..boxes]) >= (boxes div 2);
+
 
 %solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
 solve :: seq_search([
-%             %int_search([boxes], first_fail, indomain_min),int_search(positions, input_order, indomain_min)])
+             %int_search([boxes], first_fail, indomain_min),int_search(positions, input_order, indomain_min)])
              int_search(positions, input_order, indomain_min),int_search(sizes, input_order, indomain_max)])
       maximize boxes;
 %solve maximize boxes;
