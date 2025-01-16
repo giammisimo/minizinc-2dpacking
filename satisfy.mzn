@@ -17,14 +17,14 @@ constraint forall(i in 1..boxes)(
 
 % the boxes' corner must be inside the pallet
 constraint forall(i in 1..boxes)(
-  positions[i,1] > 0 /\ positions[i,1] <= k + 1 /\
-  positions[i,2] > 0 /\ positions[i,2] <= k + 1
+  positions[i,1] > 0 /\ positions[i,1] <= k /\
+  positions[i,2] > 0 /\ positions[i,2] <= k
 );
 
 %every box must be inside the pallet
 constraint forall(i in 1..boxes)(
-  positions[i,1] + sizes[i,1] <= k /\
-  positions[i,2] + sizes[i,2] <= k
+  positions[i,1] + sizes[i,1] <= k + 1 /\
+  positions[i,2] + sizes[i,2] <= k + 1
 );
 
 %the boxes must not overlap
@@ -44,10 +44,12 @@ constraint (
 );
 
 % Symmetry breaking 2: Order the positions
-constraint forall(i in 1..boxes, j in i+1..boxes) (
-  ((positions[i,1]-1) * k + (positions[i,2]-1)) <= 
-  ((positions[j,1]-1) * k + (positions[j,2]-1))
-);
+%constraint forall(i in 1..boxes, j in 1..boxes where i < j) (
+%  ((positions[i,1]-1) * k + (positions[i,2]-1)) <= 
+%  ((positions[j,1]-1) * k + (positions[j,2]-1))
+%);
+
+constraint lex2(positions);
 
 % All spare values that do not represent a box are defaulted
 constraint forall(i in boxes+1..n) (
