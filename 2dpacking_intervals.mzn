@@ -44,10 +44,12 @@ constraint (
 );
 
 % Symmetry breaking 2: Order the positions
-constraint forall(i in 1..boxes, j in 1..boxes where i < j) (
-  ((positions[i,1]-1) * k + (positions[i,2]-1)) <= 
-  ((positions[j,1]-1) * k + (positions[j,2]-1))
-);
+%constraint forall(i in 1..boxes, j in 1..boxes where i < j) (
+%  ((positions[i,1]-1) * k + (positions[i,2]-1)) <= 
+%  ((positions[j,1]-1) * k + (positions[j,2]-1))
+%);
+
+constraint lex2(positions);
 
 % All spare values that do not represent a box are defaulted
 constraint forall(i in boxes+1..n) (
@@ -106,9 +108,9 @@ var 1..min(x,y): modulo;
 constraint gcd(x,y,modulo);
 
 % If GCD is greater than 1, then the boxes must be placed at coordinates that are 1 mod GCD
-%constraint forall(i in 1..boxes)(
-%  modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
-%);
+constraint forall(i in 1..boxes)(
+  modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
+);
 
 % Predicate: Check if a point is inside a box
 predicate inside_box(int: x, int: y) =
@@ -133,7 +135,7 @@ predicate concave_point(int: i, int: j) = (
 %constraint target = boxes * 100 - (max([positions[i,1] | i in 1..boxes]) + max([positions[i,2] | i in 1..boxes]));
 %constraint target = boxes * 100 - (sum([sizes[i,1] < sizes[i,2] | i in 1..boxes]));
 
-constraint sum([sizes[i,1] > sizes[i,2] | i in 1..boxes]) >= (boxes div 2);
+%constraint sum([sizes[i,1] > sizes[i,2] | i in 1..boxes]) >= (boxes div 2);
 
 
 %solve :: int_search([boxes], first_fail, indomain_min) maximize boxes;
