@@ -10,6 +10,17 @@ array [1..n,1..2] of var 1..k: positions;
 array [1..n,1..2] of var {x,y}: sizes; 
 var 0..n: boxes;
 
+function int: gcd(int: a, int: b) = 
+  let {
+    int: abs_a = abs(a);
+    int: abs_b = abs(b);
+  } in
+  if abs_b == 0 then abs_a
+  else gcd(abs_b, abs_a mod abs_b)
+  endif;
+
+int: modulo = gcd(x, y);
+
 % x != y in sizes
 constraint forall(i in 1..boxes)(
   sizes[i,1] != sizes[i,2]
@@ -52,10 +63,10 @@ constraint (
 constraint lex2(positions);
 
 % All spare values that do not represent a box are defaulted
-constraint forall(i in boxes+1..n) (
-  positions[i,1] = k /\ positions[i,2] = k /\
-  sizes[i,1] = x /\ sizes[i,2] = y
-);
+%constraint forall(i in boxes+1..n) (
+%  positions[i,1] = k /\ positions[i,2] = k /\
+%  sizes[i,1] = x /\ sizes[i,2] = y
+%);
 
 % Predicate: Check if two boxes are adjacent
 predicate edge_exists(int: u, int: v) =
@@ -88,24 +99,6 @@ predicate edge_exists(int: u, int: v) =
 %  sum([adjacency[i,j] | j in 1..boxes]) > 1
 %);
 
-% Predicate: Greatest common divisor
-predicate gcd(int: x, int: y, var int: g) =
-  let {
-    int: p = min(ub(x),ub(y))
-  } in
-   exists(i in 1..p) (
-       x mod i = 0 /\ y mod i = 0
-       /\
-       forall(j in i+1..p) (
-           not(x mod j = 0 /\ y mod j = 0)
-       )
-       /\
-       g = i
-   )
-;
-
-var 1..min(x,y): modulo;
-constraint gcd(x,y,modulo);
 
 % If GCD is greater than 1, then the boxes must be placed at coordinates that are 1 mod GCD
 constraint forall(i in 1..boxes)(
