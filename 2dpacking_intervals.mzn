@@ -4,12 +4,6 @@ int: k;        % Size of the pallet
 int: x; int: y;% Dimensions of the boxes
 int: n = (k*k) div (x*y); % Upper bound for the boxes
 
-% Position of the upper-left corner of every box
-array [1..n,1..2] of var 1..k: positions; 
-% Sizes for every box
-array [1..n,1..2] of var {x,y}: sizes; 
-var 0..n: boxes;
-
 function int: gcd(int: a, int: b) = 
   let {
     int: abs_a = abs(a);
@@ -20,6 +14,12 @@ function int: gcd(int: a, int: b) =
   endif;
 
 int: modulo = gcd(x, y);
+
+% Position of the upper-left corner of every box
+array [1..n,1..2] of var {1 + modulo * t | t in 0..(k div modulo)}: positions; 
+% Sizes for every box
+array [1..n,1..2] of var {x,y}: sizes; 
+var 0..n: boxes;
 
 % x != y in sizes
 constraint forall(i in 1..boxes)(
