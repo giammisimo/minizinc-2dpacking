@@ -101,9 +101,9 @@ predicate edge_exists(int: u, int: v) =
 
 
 % If GCD is greater than 1, then the boxes must be placed at coordinates that are 1 mod GCD
-constraint forall(i in 1..boxes)(
-  modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
-);
+%constraint forall(i in 1..boxes)(
+%  modulo > 1 -> (positions[i,1] mod modulo = 1 /\ positions[i,2] mod modulo = 1 )
+%);
 
 % Predicate: Check if a point is inside a box
 predicate inside_box(int: x, int: y) =
