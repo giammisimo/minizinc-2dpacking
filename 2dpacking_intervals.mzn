@@ -23,7 +23,7 @@ var 0..n: boxes;
 
 % x != y in sizes
 constraint forall(i in 1..boxes)(
-  sizes[i,1] != sizes[i,2]
+  sizes[i,1] != sizes[i,2] \/ x = y
 );
 
 % the boxes' corner must be inside the pallet
