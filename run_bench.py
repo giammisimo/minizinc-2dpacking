@@ -9,7 +9,7 @@ OUT_DIR = './benchmarks-results'
     
 def main(mzn_model: str, solver: str, time_limit: int, out_dir: str):
     X = [5, 10, 15, 20]
-    K = [a - 1 for a in range(10, 101, 10)]
+    K = [a - 1 for a in range(20, 101, 10)]
     counter = 0
 
     for k in K:
