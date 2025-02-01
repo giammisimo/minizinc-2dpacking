@@ -4,6 +4,8 @@ import glob
 import re
 import matplotlib.pyplot as plt
 
+TIME_LIMIT = 300
+
 def extract_params_and_time(text_content):
     """
     Given the text content of a file, extracts:
@@ -51,7 +53,7 @@ def main():
             print(f"[INFO] File {filename} is unsatisfiable (UNSAT).")
         
         # We only plot if x, y, k, time are found
-        if x_val is not None and y_val is not None and k_val is not None and time_val is not None:
+        if x_val is not None and y_val is not None and k_val is not None and time_val is not None and time_val < TIME_LIMIT:
             key = (x_val, y_val)
             if key not in results:
                 results[key] = []
