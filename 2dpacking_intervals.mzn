@@ -19,7 +19,7 @@ int: modulo = gcd(x, y);
 array [1..n,1..2] of var {1 + modulo * t | t in 0..(k div modulo)}: positions; 
 % Sizes for every box
 array [1..n,1..2] of var {x,y}: sizes; 
-var 0..n: boxes;
+var 1..n: boxes;
 
 % x != y in sizes
 constraint forall(i in 1..boxes)(
