@@ -43,7 +43,7 @@ def main(mzn_model: str, solver: str, time_limit: int, out_dir: str):
                 print(f"[time] {elapsed_time:.2f} s", end='\r')
                 time.sleep(TIMER_INT)
             process.wait()
-            if elapsed_time > (time_limit / 1000 - 1):
+            if elapsed_time > (time_limit / 1000):
                 timed_out = True
 
             with open(f'{out_dir}/{file_name}.txt','r') as file:
