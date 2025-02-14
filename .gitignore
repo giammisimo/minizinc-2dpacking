@@ -7,3 +7,6 @@ benchmarks-results/**
 temp.mzn
 local_env.sh
 grid.txt
+
+*.pyc
+*.png

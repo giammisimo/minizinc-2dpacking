@@ -4,8 +4,32 @@ import io
 import base64
 import numpy as np
 import re
+import hashlib
+import os
+from pathlib import Path
 
 app = Flask(__name__)
+
+# Create cache directory if it doesn't exist
+CACHE_DIR = Path(__file__).parent / 'static' / 'cache'
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+def get_cache_key(text_content):
+    """Generate a unique hash key for the input text"""
+    return hashlib.md5(text_content.encode('utf-8')).hexdigest()
+
+def get_cached_image(cache_key):
+    """Try to get a cached image"""
+    cache_file = CACHE_DIR / f"{cache_key}.png"
+    if cache_file.exists():
+        with open(cache_file, 'rb') as f:
+            return base64.b64encode(f.read()).decode('utf-8')
+    return None
+
+def save_to_cache(cache_key, fig):
+    """Save the generated plot to cache"""
+    cache_file = CACHE_DIR / f"{cache_key}.png"
+    plt.savefig(cache_file, format='png', bbox_inches='tight')
 
 def extract_parameters(text):
     """
@@ -156,20 +180,39 @@ def index():
             fig, ax = plt.subplots()
             ax.text(0.5, 0.5, 'Errore: text_content mancante', fontsize=12, ha='center')
             ax.axis('off')
+            
+            # Generate error image
+            buf = io.BytesIO()
+            plt.savefig(buf, format='png')
+            buf.seek(0)
+            plot_data = base64.b64encode(buf.getvalue()).decode('utf-8')
+            buf.close()
+            plot_url = f"data:image/png;base64,{plot_data}"
+            plt.close(fig)
         else:
-            # Extract parameters from text
-            x, y, k = extract_parameters(text_content)
-            boxes, positions, sizes = parse_minizinc(text_content)
-            fig, ax = visualize_grid(x, y, k, boxes, positions, sizes)
-        
-        buf = io.BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf, format='png')
-        buf.seek(0)
-        plot_data = base64.b64encode(buf.getvalue()).decode('utf-8')
-        buf.close()
-        plot_url = f"data:image/png;base64,{plot_data}"
-        plt.close(fig)  # Close the figure to release memory
+            # Check cache first
+            cache_key = get_cache_key(text_content)
+            cached_image = get_cached_image(cache_key)
+            
+            if cached_image:
+                plot_url = f"data:image/png;base64,{cached_image}"
+            else:
+                # Generate new image if not in cache
+                x, y, k = extract_parameters(text_content)
+                boxes, positions, sizes = parse_minizinc(text_content)
+                fig, ax = visualize_grid(x, y, k, boxes, positions, sizes)
+                
+                # Save to cache
+                save_to_cache(cache_key, fig)
+                
+                # Convert to base64 for display
+                buf = io.BytesIO()
+                plt.savefig(buf, format='png', bbox_inches='tight')
+                buf.seek(0)
+                plot_data = base64.b64encode(buf.getvalue()).decode('utf-8')
+                buf.close()
+                plot_url = f"data:image/png;base64,{plot_data}"
+                plt.close(fig)  # Close the figure to release memory
 
     return render_template('index.html', text_content=text_content, plot_url=plot_url)
 
