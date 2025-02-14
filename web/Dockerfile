@@ -4,8 +4,11 @@ RUN apt update && apt install -y python3 python3-pip
 COPY ./src/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
+# Install only watchdog for file monitoring
+RUN pip install --no-cache-dir --break-system-packages watchdog
+
 COPY ./src /app
 WORKDIR /app
 
 USER nobody
-CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["python3", "-m", "flask", "run", "--host=0.0.0.0", "--debug"]

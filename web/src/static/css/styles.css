@@ -1,0 +1,134 @@
+:root {
+    --background-color: #e0e0e0;
+    --text-color: #555;
+    --form-background: #e0e0e0;
+    --input-text-color: #000;
+    --shadow-light: #ffffff;
+    --shadow-dark: #bebebe;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    padding: 20px;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.image-container {
+    flex: 0 1 600px;
+    max-width: 80%;
+}
+
+.form-container {
+    flex: 0 1 1000px;
+    max-width: 90%;
+}
+
+form {
+    background-color: var(--form-background);
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 70%;
+    margin: auto;
+    box-shadow: 20px 20px 60px var(--shadow-dark),
+                -20px -20px 60px var(--shadow-light);
+}
+
+textarea,
+input[type="text"] {
+    width: calc(100% - 20px);
+    margin-bottom: 20px;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: var(--form-background);
+    color: var(--input-text-color);
+    box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                inset -5px -5px 10px var(--shadow-light);
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 400px;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: var(--form-background);
+    box-shadow: 5px 5px 10px var(--shadow-dark),
+                -5px -5px 10px var(--shadow-light);
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--input-text-color);
+}
+
+button:active {
+    box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                inset -5px -5px 10px var(--shadow-light);
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+img {
+    width: 600px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 10px 10px 30px var(--shadow-dark),
+                -10px -10px 30px var(--shadow-light);
+}
+
+.toggle-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.toggle-container label {
+    cursor: pointer;
+    font-weight: normal;
+}
+
+footer {
+    text-align: center;
+    padding-top: 50px;
+}
+
+@media (max-width: 1200px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .image-container,
+    .form-container {
+        flex: 0 1 auto;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    form {
+        width: 100%;
+    }
+}

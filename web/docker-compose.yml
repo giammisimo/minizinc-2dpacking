@@ -6,4 +6,9 @@ services:
     container_name: "2dpacking"
     ports:
       - "0.0.0.0:7777:5000"
+    volumes:
+      - ./src:/app
+    environment:
+      - FLASK_DEBUG=1
+      - FLASK_ENV=development
     restart: unless-stopped

@@ -5,137 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask Text to Plot</title>
-    <style>
-        :root {
-            --background-color: #e0e0e0;
-            --text-color: #555;
-            --form-background: #e0e0e0;
-            --input-text-color: #000;
-            --shadow-light: #ffffff;
-            --shadow-dark: #bebebe;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            padding: 20px;
-            margin: 0;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        .image-container {
-            flex: 0 1 600px;
-            max-width: 80%;
-        }
-
-        .form-container {
-            flex: 0 1 1000px;
-            max-width: 90%;
-        }
-
-        form {
-            background-color: var(--form-background);
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 70%;
-            margin: auto;
-            box-shadow: 20px 20px 60px var(--shadow-dark),
-                        -20px -20px 60px var(--shadow-light);
-        }
-
-        textarea,
-        input[type="text"] {
-            width: calc(100% - 20px);
-            margin-bottom: 20px;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background: var(--form-background);
-            color: var(--input-text-color);
-            box-shadow: inset 5px 5px 10px var(--shadow-dark),
-                        inset -5px -5px 10px var(--shadow-light);
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        
-        textarea{
-            height: 400px;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background: var(--form-background);
-            box-shadow: 5px 5px 10px var(--shadow-dark),
-                        -5px -5px 10px var(--shadow-light);
-            font-size: 16px;
-            cursor: pointer;
-            color: var(--input-text-color);
-        }
-
-        button:active {
-            box-shadow: inset 5px 5px 10px var(--shadow-dark),
-                        inset -5px -5px 10px var(--shadow-light);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        img {
-            width: 600px;
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 20px auto;
-            border-radius: 10px;
-            box-shadow: 10px 10px 30px var(--shadow-dark),
-                        -10px -10px 30px var(--shadow-light);
-        }
-
-        .toggle-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-        }
-
-        .toggle-container label {
-            cursor: pointer;
-            font-weight: normal;
-        }
-
-        @media (max-width: 1200px) {
-            .container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .image-container,
-            .form-container {
-                flex: 0 1 auto;
-                max-width: 100%;
-                width: 100%;
-            }
-
-            form {
-                width: 100%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
@@ -155,86 +25,18 @@
         
         <div class="form-container">
             <form method="POST">
-                <label for="text_content">Testo:</label>
-                <textarea id="text_content" name="text_content" rows="10" placeholder="Inserisci il tuo testo...">{{ text_content }}</textarea>
-                
-                <label for="k">K:</label>
-                <input type="text" id="k" name="k" value="{{ k_value }}" placeholder="Inserisci k">
-                
-                <label for="x">X:</label>
-                <input type="text" id="x" name="x" value="{{ x_value }}" placeholder="Inserisci x">
-                
-                <label for="y">Y:</label>
-                <input type="text" id="y" name="y" value="{{ y_value }}" placeholder="Inserisci y">
+                <label for="text_content">Testo (includi x:, y:, k: nel testo):</label>
+                <textarea id="text_content" name="text_content" rows="10" placeholder="Inserisci il tuo testo includendo x:, y:, k: nei primi righi...">{{ text_content }}</textarea>
                 
                 <button type="submit">Genera Plot</button>
             </form>
         </div>
     </div>
 
-    <script>
-        // Funzioni per gestire i cookie
-        function setCookie(name, value, days) {
-            const d = new Date();
-            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-            const expires = "expires=" + d.toUTCString();
-            document.cookie = `${name}=${value};${expires};path=/`;
-        }
-    
-        function getCookie(name) {
-            const cname = name + "=";
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const cookieArray = decodedCookie.split(';');
-            for (let i = 0; i < cookieArray.length; i++) {
-                let c = cookieArray[i].trim();
-                if (c.indexOf(cname) === 0) {
-                    return c.substring(cname.length, c.length);
-                }
-            }
-            return "";
-        }
-    
-        // Gestione modalità scura
-        const darkModeToggle = document.getElementById('darkModeToggle');
-    
-        // Funzione per applicare la modalità scura
-        function applyDarkMode(isDark) {
-            if (isDark) {
-                document.documentElement.style.setProperty('--background-color', '#333');
-                document.documentElement.style.setProperty('--text-color', '#ddd');
-                document.documentElement.style.setProperty('--form-background', '#444');
-                document.documentElement.style.setProperty('--input-text-color', '#fff');
-                document.documentElement.style.setProperty('--shadow-light', '#555');
-                document.documentElement.style.setProperty('--shadow-dark', '#222');
-            } else {
-                document.documentElement.style.setProperty('--background-color', '#e0e0e0');
-                document.documentElement.style.setProperty('--text-color', '#555');
-                document.documentElement.style.setProperty('--form-background', '#e0e0e0');
-                document.documentElement.style.setProperty('--input-text-color', '#000');
-                document.documentElement.style.setProperty('--shadow-light', '#ffffff');
-                document.documentElement.style.setProperty('--shadow-dark', '#bebebe');
-            }
-            // Aggiorna il toggle
-            darkModeToggle.checked = isDark;
-        }
-    
-        // Controlla il cookie all'avvio
-        const darkModeCookie = getCookie("darkMode");
-        if (darkModeCookie) {
-            applyDarkMode(darkModeCookie === "true");
-        }
-    
-        // Event listener per cambiare modalità
-        darkModeToggle.addEventListener('change', () => {
-            const isDark = darkModeToggle.checked;
-            applyDarkMode(isDark);
-            setCookie("darkMode", isDark, 7); // Salva la preferenza per 7 giorni
-        });
-    </script>    
+    <footer>
+        <p>Copyright © Gian Marco Simonazzi - Andrea Ciccarello</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
 </body>
-
-<footer style="text-align: center; padding-top: 50px;">
-    <p>Copyright © Gian Marco Simonazzi - Andrea Ciccarello</a></p>
-</footer>
-
 </html>

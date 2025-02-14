@@ -7,6 +7,23 @@ import re
 
 app = Flask(__name__)
 
+def extract_parameters(text):
+    """
+    Extract x, y, k parameters from the input text
+    """
+    params = {}
+    lines = text.split('\n')
+    for line in lines:
+        if ':' in line:
+            key, value = line.split(':')
+            key = key.strip().lower()
+            if key in ['x', 'y', 'k']:
+                try:
+                    params[key] = int(value.strip())
+                except ValueError:
+                    continue
+    return params.get('x', 1), params.get('y', 1), params.get('k', 1)
+
 def parse_gist(text):
     """
     Parse a Gist node to extract values.
@@ -134,23 +151,14 @@ def index():
 
     if request.method == 'POST':
         text_content = request.form['text_content']
-        x_value = request.form.get('x', '')
-        y_value = request.form.get('y', '')
-        k_value = request.form.get('k', '')
-
-        # Validate and process the inputs
-        try:
-            x = int(x_value) if x_value else 1
-            y = int(y_value) if y_value else 1
-            k = int(k_value) if k_value else 1
-        except ValueError:
-            x, y, k = 1, 1, 1  # Default to 1 if inputs are invalid
 
         if not text_content:
             fig, ax = plt.subplots()
             ax.text(0.5, 0.5, 'Errore: text_content mancante', fontsize=12, ha='center')
             ax.axis('off')
         else:
+            # Extract parameters from text
+            x, y, k = extract_parameters(text_content)
             boxes, positions, sizes = parse_minizinc(text_content)
             fig, ax = visualize_grid(x, y, k, boxes, positions, sizes)
         
