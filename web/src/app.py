@@ -109,13 +109,13 @@ def visualize_grid(x, y, k, boxes, positions, sizes):
     for idx in range(boxes):
         pos = positions[idx]
         size = sizes[idx]
-        color = colors[idx % len(colors)]
+        box_color = colors[idx % len(colors)]
         # Adjust for coordinate system (bottom-left origin)
         ax.add_patch(plt.Rectangle((pos[0]-1, pos[1]-1), 
                                    size[0], size[1], 
-                                   color=color, 
-                                   alpha=0.7, 
-                                   edgecolor='black'))
+                                   facecolor=box_color,
+                                   edgecolor='black',
+                                   alpha=0.7))
         
         # Add index text to the box
         # Adjust font size based on box size to ensure visibility
