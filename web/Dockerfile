@@ -7,12 +7,13 @@ RUN pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 # Install only watchdog for file monitoring
 RUN pip install --no-cache-dir --break-system-packages watchdog
 
-COPY ./src /app
 WORKDIR /app
 
-# Create cache directory with correct permissions
-RUN mkdir -p /app/static/cache && \
-    chown -R nobody:nogroup /app/static/cache
+# Create a non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser && \
+    mkdir -p /app/static/cache && \
+    chown -R appuser:appuser /app
 
-USER nobody
+USER appuser
+
 CMD ["python3", "-m", "flask", "run", "--host=0.0.0.0", "--debug"]
