@@ -68,13 +68,13 @@ def parse_gist(text):
     
     # Extract positions
     positions_line = lines['positions']
-    positions_str = re.findall('\[[0-9, ]+',positions_line)[0] + ']'
+    positions_str = re.findall(r'\[[0-9, ]+',positions_line)[0] + ']'
     positions_raw = eval(positions_str)
     positions = [(int(positions_raw[i]), int(positions_raw[i+1])) for i in range(0, len(positions_raw), 2)]
     
     # Extract sizes
     sizes_line = lines['sizes']
-    sizes_str = re.findall('\[[0-9, ]+',sizes_line)[0] + ']'
+    sizes_str = re.findall(r'\[[0-9, ]+',sizes_line)[0] + ']'
     sizes_raw = eval(sizes_str)
     sizes = [(int(sizes_raw[i]), int(sizes_raw[i+1])) for i in range(0, len(sizes_raw), 2)]
 

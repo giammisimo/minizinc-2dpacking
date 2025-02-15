@@ -9,11 +9,16 @@ RUN pip install --no-cache-dir --break-system-packages watchdog
 
 WORKDIR /app
 
-# Create a non-root user
+# Create a non-root user and set up directories with proper permissions
 RUN groupadd -r appuser && useradd -r -g appuser appuser && \
     mkdir -p /app/static/cache && \
-    chown -R appuser:appuser /app
+    mkdir -p /home/appuser/.config/matplotlib && \
+    chown -R appuser:appuser /app && \
+    chown -R appuser:appuser /home/appuser
 
 USER appuser
+
+# Set matplotlib config directory
+ENV MPLCONFIGDIR=/home/appuser/.config/matplotlib
 
 CMD ["python3", "-m", "flask", "run", "--host=0.0.0.0", "--debug"]
