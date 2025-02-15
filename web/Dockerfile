@@ -14,6 +14,7 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser && \
     mkdir -p /app/static/cache && \
     mkdir -p /home/appuser/.config/matplotlib && \
     chown -R appuser:appuser /app && \
+    chmod -R 777 /app/static/cache && \
     chown -R appuser:appuser /home/appuser
 
 USER appuser

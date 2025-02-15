@@ -12,7 +12,21 @@ app = Flask(__name__)
 
 # Create cache directory if it doesn't exist
 CACHE_DIR = Path(__file__).parent / 'static' / 'cache'
-CACHE_DIR.mkdir(parents=True, exist_ok=True)
+try:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    # Ensure the directory has correct permissions
+    os.chmod(CACHE_DIR, 0o777)
+except Exception as e:
+    print(f"Warning: Could not create or set permissions for cache directory: {e}")
+
+# Add cache control headers
+@app.after_request
+def add_header(response):
+    """Add headers to prevent caching."""
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
 
 def get_cache_key(text_content):
     """Generate a unique hash key for the input text"""
