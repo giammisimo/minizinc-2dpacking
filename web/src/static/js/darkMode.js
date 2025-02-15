@@ -1,3 +1,14 @@
+// Funzione per applicare il tema immediatamente
+function applyThemeImmediately() {
+    const theme = localStorage.getItem('theme');
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+}
+
+// Applica il tema immediatamente, prima del caricamento del DOM
+applyThemeImmediately();
+
 // Cookie management functions
 function setCookie(name, value, days) {
     const d = new Date();
@@ -42,18 +53,28 @@ function applyDarkMode(isDark) {
 
 // Initialize dark mode
 document.addEventListener('DOMContentLoaded', () => {
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    
-    // Check cookie on startup
-    const darkModeCookie = getCookie("darkMode");
-    if (darkModeCookie) {
-        applyDarkMode(darkModeCookie === "true");
+    const toggle = document.getElementById('darkModeToggle');
+    const theme = localStorage.getItem('theme');
+
+    // Set initial theme
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        toggle.checked = true;
     }
 
-    // Event listener for mode change
-    darkModeToggle.addEventListener('change', () => {
-        const isDark = darkModeToggle.checked;
-        applyDarkMode(isDark);
-        setCookie("darkMode", isDark, 7);
+    // Handle theme toggle with smooth transition
+    toggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            document.documentElement.style.setProperty('--transition-speed', '0.3s');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            document.documentElement.style.setProperty('--transition-speed', '0.3s');
+        }
     });
+
+    // Aggiungi classe per animazioni dopo il caricamento
+    document.body.classList.add('content-loaded');
 });

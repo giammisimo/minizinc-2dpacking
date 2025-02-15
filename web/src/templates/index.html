@@ -4,29 +4,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask Text to Plot</title>
+    <title>2D Packing Visualizer</title>
+    <style>
+        /* Stile base per prevenire il flash */
+        html {
+            background-color: var(--background-color, #e6e4f0);
+        }
+        html[data-theme="dark"] {
+            background-color: var(--background-color, #1a1a2e);
+        }
+    </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
     <div class="toggle-container">
-        <label for="darkModeToggle">
+        <label for="darkModeToggle" class="switch">
             <input type="checkbox" id="darkModeToggle">
+            <span class="slider"></span>
             Modalità Scura
         </label>
     </div>
 
     <div class="container">
         <div class="image-container">
+            {% if error_message %}
+            <div class="error-message">
+                {{ error_message }}
+            </div>
+            {% endif %}
             {% if plot_url %}
-            <img src="{{ plot_url }}" alt="Generated Plot">
+            <img src="{{ plot_url }}" alt="Generated Plot" class="fade-in">
             {% endif %}
         </div>
         
         <div class="form-container">
-            <form method="POST">
+            <form method="POST" class="fade-in">
                 <label for="text_content">Testo (includi x:, y:, k: nel testo):</label>
-                <textarea id="text_content" name="text_content" rows="10" placeholder="Inserisci il tuo testo includendo x:, y:, k: nei primi righi...">{{ text_content }}</textarea>
+                <textarea id="text_content" name="text_content" rows="10" 
+                    placeholder="Esempio:
+x: 3
+y: 2
+k: 5
+boxes 3
+positions [1 1, 2 1, 4 1]
+sizes [2 1, 1 1, 1 1]">{{ text_content }}</textarea>
                 
                 <button type="submit">Genera Plot</button>
             </form>

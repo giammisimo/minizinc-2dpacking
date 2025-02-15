@@ -1,10 +1,23 @@
 :root {
-    --background-color: #e0e0e0;
-    --text-color: #555;
-    --form-background: #e0e0e0;
-    --input-text-color: #000;
+    --background-color: #e6e4f0;
+    --text-color: #4a4a6a;
+    --form-background: #e6e4f0;
+    --input-text-color: #2d2d4a;
     --shadow-light: #ffffff;
-    --shadow-dark: #bebebe;
+    --shadow-dark: #c5c3d8;
+    --accent-color: #6b63b5;
+    --button-hover: #7a71c7;
+}
+
+[data-theme="dark"] {
+    --background-color: #1a1a2e;
+    --text-color: #e0e0ff;
+    --form-background: #1a1a2e;
+    --input-text-color: #ffffff;
+    --shadow-light: #252540;
+    --shadow-dark: #12121e;
+    --accent-color: #3a6ea5;
+    --button-hover: #4481bf;
 }
 
 body {
@@ -13,6 +26,8 @@ body {
     color: var(--text-color);
     padding: 20px;
     margin: 0;
+    opacity: 0;
+    animation: fadeInContent 0.3s ease-in forwards;
 }
 
 .container {
@@ -69,12 +84,18 @@ button {
     padding: 15px;
     border: none;
     border-radius: 10px;
-    background: var(--form-background);
+    background: var(--accent-color);
     box-shadow: 5px 5px 10px var(--shadow-dark),
                 -5px -5px 10px var(--shadow-light);
     font-size: 16px;
     cursor: pointer;
-    color: var(--input-text-color);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: var(--button-hover);
+    transform: translateY(-2px);
 }
 
 button:active {
@@ -110,6 +131,17 @@ img {
     font-weight: normal;
 }
 
+.error-message {
+    background: var(--form-background);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px auto;
+    box-shadow: 5px 5px 15px var(--shadow-dark),
+                -5px -5px 15px var(--shadow-light);
+    color: #e74c3c;
+    text-align: center;
+}
+
 footer {
     text-align: center;
     padding-top: 50px;
@@ -130,5 +162,101 @@ footer {
 
     form {
         width: 100%;
+    }
+}
+
+/* Animazioni e transizioni */
+* {
+    transition: background-color 0.3s ease,
+                color 0.3s ease,
+                box-shadow 0.3s ease;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInContent {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Switch Toggle Style */
+.switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    padding-left: 50px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    left: 0;
+    width: 40px;
+    height: 20px;
+    background-color: var(--form-background);
+    border-radius: 20px;
+    box-shadow: inset 2px 2px 5px var(--shadow-dark),
+                inset -2px -2px 5px var(--shadow-light);
+    transition: 0.3s;
+}
+
+.slider:before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 2px;
+    bottom: 2px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 2px 2px 5px var(--shadow-dark);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* Hover effects */
+button, textarea, .error-message {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover, textarea:focus {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 12px var(--shadow-dark),
+                -6px -6px 12px var(--shadow-light);
+}
+
+/* Loading animation */
+@keyframes shimmer {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
     }
 }

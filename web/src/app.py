@@ -172,49 +172,52 @@ def visualize_grid(x, y, k, boxes, positions, sizes):
 def index():
     text_content = ""
     plot_url = None
-
+    error_message = None
+    
     if request.method == 'POST':
         text_content = request.form['text_content']
-
         if not text_content:
-            fig, ax = plt.subplots()
-            ax.text(0.5, 0.5, 'Errore: text_content mancante', fontsize=12, ha='center')
-            ax.axis('off')
-            
-            # Generate error image
-            buf = io.BytesIO()
-            plt.savefig(buf, format='png')
-            buf.seek(0)
-            plot_data = base64.b64encode(buf.getvalue()).decode('utf-8')
-            buf.close()
-            plot_url = f"data:image/png;base64,{plot_data}"
-            plt.close(fig)
+            error_message = "Per favore, inserisci il testo con i parametri richiesti"
         else:
-            # Check cache first
-            cache_key = get_cache_key(text_content)
-            cached_image = get_cached_image(cache_key)
-            
-            if cached_image:
-                plot_url = f"data:image/png;base64,{cached_image}"
-            else:
-                # Generate new image if not in cache
-                x, y, k = extract_parameters(text_content)
-                boxes, positions, sizes = parse_minizinc(text_content)
-                fig, ax = visualize_grid(x, y, k, boxes, positions, sizes)
+            try:
+                # Check cache first
+                cache_key = get_cache_key(text_content)
+                cached_image = get_cached_image(cache_key)
                 
-                # Save to cache
-                save_to_cache(cache_key, fig)
+                if cached_image:
+                    plot_url = f"data:image/png;base64,{cached_image}"
+                else:
+                    # Generate new image if not in cache
+                    x, y, k = extract_parameters(text_content)
+                    if not all([x, y, k]):
+                        raise ValueError("Parametri x, y, k mancanti o non validi")
+                        
+                    boxes, positions, sizes = parse_minizinc(text_content)
+                    if not all([boxes, positions, sizes]):
+                        raise ValueError("Errore nel parsing del contenuto")
+                        
+                    fig, ax = visualize_grid(x, y, k, boxes, positions, sizes)
+                    
+                    # Save to cache
+                    save_to_cache(cache_key, fig)
+                    
+                    # Convert to base64 for display
+                    buf = io.BytesIO()
+                    plt.savefig(buf, format='png', bbox_inches='tight')
+                    buf.seek(0)
+                    plot_data = base64.b64encode(buf.getvalue()).decode('utf-8')
+                    buf.close()
+                    plot_url = f"data:image/png;base64,{plot_data}"
+                    plt.close(fig)
+            except ValueError as e:
+                error_message = str(e)
+            except Exception as e:
+                error_message = f"Si è verificato un errore durante la generazione dell'immagine: {str(e)}"
                 
-                # Convert to base64 for display
-                buf = io.BytesIO()
-                plt.savefig(buf, format='png', bbox_inches='tight')
-                buf.seek(0)
-                plot_data = base64.b64encode(buf.getvalue()).decode('utf-8')
-                buf.close()
-                plot_url = f"data:image/png;base64,{plot_data}"
-                plt.close(fig)  # Close the figure to release memory
-
-    return render_template('index.html', text_content=text_content, plot_url=plot_url)
+    return render_template('index.html', 
+                         text_content=text_content, 
+                         plot_url=plot_url, 
+                         error_message=error_message)
 
 if __name__ == '__main__':
     app.run(debug=True)
