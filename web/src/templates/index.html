@@ -31,18 +31,16 @@
 
     <div class="container">
         <div class="image-container">
-            {% if error_message %}
-            <div class="error-message">
-                {{ error_message }}
+            <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Generazione in corso...</p>
             </div>
-            {% endif %}
-            {% if plot_url %}
-            <img src="{{ plot_url }}" alt="Generated Plot" class="fade-in">
-            {% endif %}
+            <div id="error-message" class="error-message" style="display: none"></div>
+            <img id="plot-image" style="display: none;" alt="Generated Plot" class="fade-in">
         </div>
         
         <div class="form-container">
-            <form method="POST" class="fade-in">
+            <form id="plotForm" class="fade-in">
                 <label for="text_content">Testo (includi x:, y:, k: nel testo):</label>
                 <textarea id="text_content" name="text_content" rows="10" 
                     placeholder="Esempio:
@@ -51,7 +49,7 @@ y: 2
 k: 5
 boxes 3
 positions [1 1, 2 1, 4 1]
-sizes [2 1, 1 1, 1 1]">{{ text_content }}</textarea>
+sizes [2 1, 1 1, 1 1]"></textarea>
                 
                 <button type="submit">Genera Plot</button>
             </form>
@@ -63,5 +61,6 @@ sizes [2 1, 1 1, 1 1]">{{ text_content }}</textarea>
     </footer>
 
     <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/formHandler.js') }}"></script>
 </body>
 </html>
